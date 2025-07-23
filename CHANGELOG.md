@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/Decodo/sdk/compare/v1.0.0...v1.0.1) (2025-07-23)
+
+
+### Bug Fixes
+
+* trigger 1.0.1 release ([b11c0a2](https://github.com/Decodo/sdk/commit/b11c0a28874cc89ca719449c8fcf732f53b01696))
+
 # 1.0.0 (2025-07-23)
 
 
