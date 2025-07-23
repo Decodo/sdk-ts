@@ -2,6 +2,7 @@
   "name": "@decodo/sdk",
   "version": "0.1.0",
   "description": "",
+  "type": "module",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/types/index.d.ts",
