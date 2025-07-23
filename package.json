@@ -1,0 +1,53 @@
+{
+  "name": "@decodo/sdk",
+  "version": "0.1.0",
+  "description": "",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/types/index.d.ts",
+  "files": [
+    "lib/*",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npm run lint && rm -rf lib && rollup -c",
+    "lint": "npm run lint:es && npm run lint:ts",
+    "lint:es": "eslint .",
+    "lint:ts": "tsc --noEmit",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Decodo/sdk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Decodo/sdk/issues"
+  },
+  "homepage": "https://github.com/Decodo/sdk#readme",
+  "dependencies": {
+    "rollup": "^4.45.1",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.27.1",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "eslint": "^8.0.0",
+    "rollup-plugin-dts": "^6.2.1",
+    "semantic-release": "^24.0.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.0",
+    "@semantic-release/npm": "^12.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
