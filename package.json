@@ -1,6 +1,6 @@
 {
   "name": "@decodo/sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "type": "module",
   "main": "lib/cjs/index.js",
