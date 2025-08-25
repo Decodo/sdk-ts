@@ -1,5 +1,5 @@
 {
-  "name": "@decodo/sdk",
+  "name": "@decodo/sdk-ts",
   "version": "1.0.3",
   "description": "",
   "type": "module",
