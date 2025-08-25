@@ -1,3 +1,3 @@
-# @decodo/sdk
+# @decodo/sdk-ts
 
-Official Decodo SDK for helping integrate with Decodo services.
+Official Decodo Typescript SDK for helping integrate with Decodo services.
