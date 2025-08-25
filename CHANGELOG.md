@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/Decodo/sdk-ts/compare/v1.1.1...v1.1.2) (2025-08-25)
+
+
+### Bug Fixes
+
+* update readme ([#7](https://github.com/Decodo/sdk-ts/issues/7)) ([9554495](https://github.com/Decodo/sdk-ts/commit/9554495eff18a7d7b0f45ff41671920565f23693))
+
 ## [1.1.1](https://github.com/Decodo/sdk-ts/compare/v1.1.0...v1.1.1) (2025-08-25)
 
 
