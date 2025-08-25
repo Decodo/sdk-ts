@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Decodo/sdk-ts/compare/v1.1.2...v1.2.0) (2025-08-25)
+
+
+### Features
+
+* add Scraper API endpoint consts ([#8](https://github.com/Decodo/sdk-ts/issues/8)) ([5b7d81b](https://github.com/Decodo/sdk-ts/commit/5b7d81b5f9d2b63641df06a15eb040d3e40e9a85))
+
 ## [1.1.2](https://github.com/Decodo/sdk-ts/compare/v1.1.1...v1.1.2) (2025-08-25)
 
 
