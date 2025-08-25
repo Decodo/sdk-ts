@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/Decodo/sdk-ts/compare/v1.1.0...v1.1.1) (2025-08-25)
+
+
+### Bug Fixes
+
+* empty commit to trigger release ([#6](https://github.com/Decodo/sdk-ts/issues/6)) ([6c6e95f](https://github.com/Decodo/sdk-ts/commit/6c6e95fc49735fb465c9432f84dd2350acf2e2f1))
+
 # [1.1.0](https://github.com/Decodo/sdk-ts/compare/v1.0.3...v1.1.0) (2025-08-25)
 
 
