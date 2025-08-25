@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/Decodo/sdk-ts/compare/v1.0.3...v1.1.0) (2025-08-25)
+
+
+### Bug Fixes
+
+* rename repository url to sdk-ts ([#4](https://github.com/Decodo/sdk-ts/issues/4)) ([8dcbd85](https://github.com/Decodo/sdk-ts/commit/8dcbd85f1c8bf0d3bcd3c50cb059357f82cd0af6))
+
+
+### Features
+
+* add targets and response types ([#3](https://github.com/Decodo/sdk-ts/issues/3)) ([ed39257](https://github.com/Decodo/sdk-ts/commit/ed392574b60c7378ce1fe266f72e2edf3b21f96e))
+
 ## [1.0.3](https://github.com/Decodo/sdk/compare/v1.0.2...v1.0.3) (2025-07-23)
 
 
