@@ -46,8 +46,6 @@ npm run example:agent-google
 npm run example:agent-amazon
 ```
 
-A simple agentic example:
-
 ## Available Tools
 
 See the `tools/` directory for a list of available tools.
