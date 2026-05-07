@@ -1,3 +1,156 @@
 # @decodo/sdk-ts
 
-Official Decodo Typescript SDK for helping integrate with Decodo services.
+Official TypeScript SDK for the Decodo Web Scraping API.
+
+Features:
+
+- Strongly typed per-target parameters with full IDE autocomplete
+- Sync, async, and batch scraping
+- Zero runtime dependencies (uses native `fetch`, Node 18+)
+- Typed error hierarchy
+
+## Installation
+
+```bash
+npm install @decodo/sdk-ts
+```
+
+## Quick start
+
+```typescript
+import { DecodoClient } from "@decodo/sdk-ts";
+
+const client = new DecodoClient({
+  webScrapingApi: {
+    token: "<basic_auth_token>",
+  },
+});
+
+const result = await client.webScrapingApi.scrape({
+  target: "google_search",
+  query: "coffee shops",
+  geo: "United States",
+  parse: true,
+});
+console.log(result.results[0].content);
+```
+
+## Configuration
+
+```typescript
+const client = new DecodoClient({
+  webScrapingApi: {
+    token: "<basic_auth_token>",
+  },
+  timeoutMs: 120_000, // optional, request timeout in ms (default: 180s)
+});
+```
+
+## Web Scraping API
+
+Access via `client.webScrapingApi`.
+
+### Sync scrape
+
+Blocks until the scraping result is ready:
+
+```typescript
+const result = await client.webScrapingApi.scrape({
+  target: "amazon_product",
+  query: "B09H74FXNW",
+  parse: true,
+});
+```
+
+### Async scrape
+
+Creates a task and returns immediately. Poll separately for results:
+
+```typescript
+const task = await client.webScrapingApi.scrapeAsync({
+  target: "google_search",
+  query: "laptop reviews",
+});
+
+const meta = await client.webScrapingApi.getStatus(task.id);
+console.log(meta.status); // 'pending' | 'done' | 'faulted'
+
+const results = await client.webScrapingApi.getResults(task.id);
+```
+
+### Batch scrape
+
+Send multiple URLs or queries in a single request:
+
+```typescript
+const batch = await client.webScrapingApi.scrapeBatch({
+  target: "google_search",
+  query: ["coffee", "tea", "juice"],
+});
+console.log(batch.id);
+```
+
+## Error handling
+
+The SDK throws typed errors that map to API error codes:
+
+```typescript
+import {
+  DecodoError,
+  AuthenticationError,
+  RateLimitError,
+  ValidationError,
+  TimeoutError,
+} from "@decodo/sdk-ts";
+
+try {
+  await client.webScrapingApi.scrape({
+    target: "google_search",
+    query: "test",
+  });
+} catch (err) {
+  if (err instanceof AuthenticationError) {
+    // 401/403 — bad credentials
+  } else if (err instanceof RateLimitError) {
+    // 429 — too many requests
+  } else if (err instanceof ValidationError) {
+    // 422 — invalid parameters
+    console.log(err.errors);
+  } else if (err instanceof TimeoutError) {
+    // request timed out
+  }
+}
+```
+
+## Type-safe targets
+
+All target parameters are strongly typed. Your IDE will autocomplete only the parameters valid for each target:
+
+```typescript
+await client.webScrapingApi.scrape({
+  target: "google_search",
+  query: "test", // ok
+  geo: "US", // ok
+  // product_id: '...'  // type error — not valid for google_search
+});
+```
+
+You can also introspect target metadata at runtime:
+
+```typescript
+import { targets, targetMeta, parameterMeta } from "@decodo/sdk-ts";
+
+console.log(targets);
+// ['google_search', 'amazon_product', ...]
+
+console.log(targetMeta["google_search"].parameters);
+// ['query', 'headless', 'locale', 'geo', ...]
+
+console.log(parameterMeta["query"]);
+// { type: 'string', maxLength: 2048 }
+```
+
+## Requirements
+
+- Node.js >= 18 (for native `fetch`)
+- TypeScript >= 5.0 (recommended for best type inference)
