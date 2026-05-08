@@ -6,8 +6,7 @@ const DEFAULT_TIMEOUT_MS = 180_000;
 
 export type DecodoConfig = {
   webScrapingApi?: {
-    username: string;
-    password: string;
+    token: string;
   };
   timeoutMs?: number;
 };
@@ -28,8 +27,7 @@ export class DecodoClient {
           baseUrl: WEB_API_BASE_URL,
           auth: {
             type: 'basic',
-            username: config.webScrapingApi.username,
-            password: config.webScrapingApi.password,
+            token: config.webScrapingApi.token,
           },
           timeoutMs,
         }),
@@ -39,7 +37,7 @@ export class DecodoClient {
         get() {
           notConfigured(
             'webScrapingApi',
-            'Provide webScrapingApi.username and webScrapingApi.password in DecodoConfig.',
+            'Provide webScrapingApi.token in DecodoConfig.',
           );
         },
       });

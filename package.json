@@ -22,7 +22,7 @@
     "build"
   ],
   "scripts": {
-    "codegen": "tsx codegen/generate-types.ts",
+    "codegen": "tsx codegen/generate-from-ir.ts",
     "build": "pnpm run codegen && pnpm run build:esm && pnpm run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.build.cjs.json",
@@ -39,5 +39,8 @@
     "tsx": "^4.19.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.40.0"
+  },
+  "dependencies": {
+    "json-schema-to-typescript": "^15.0.4"
   }
 }

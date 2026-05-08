@@ -9,8 +9,7 @@ import type { ErrorResponse } from './types/responses.js';
 
 export type BasicAuth = {
   type: 'basic';
-  username: string;
-  password: string;
+  token: string;
 };
 
 export type ApiKeyAuth = {
@@ -34,8 +33,7 @@ export class HttpClient {
     this.timeoutMs = config.timeoutMs;
 
     if (config.auth.type === 'basic') {
-      this.authHeader =
-        'Basic ' + btoa(`${config.auth.username}:${config.auth.password}`);
+      this.authHeader = `Basic ${config.auth.token}`;
     } else {
       this.authHeader = config.auth.apiKey;
     }
@@ -95,12 +93,12 @@ export class HttpClient {
           'ABORT_ERR'
       ) {
         throw new TimeoutError(
-          `Request to ${path} timed out after ${this.timeoutMs}ms`
+          `Request to ${path} timed out after ${this.timeoutMs}ms`,
         );
       }
       if (err instanceof DOMException && err.name === 'AbortError') {
         throw new TimeoutError(
-          `Request to ${path} timed out after ${this.timeoutMs}ms`
+          `Request to ${path} timed out after ${this.timeoutMs}ms`,
         );
       }
       throw err;
