@@ -2,14 +2,13 @@ import { DecodoClient, Target, type ScrapeRequest } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
-    token: '<web_api_token>',
+    token: 'VTAwMDAxNzk1MDc6UFcxMDcxZGQ3Yzg2ZjM5MjA1YjQ4NjNhZjk1OGMxMGUxNGY=',
   },
 });
 
 const req: ScrapeRequest = {
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
+  target: Target.AmazonProduct,
+  query: 'B09H74FXNW',
   parse: true,
 };
 
