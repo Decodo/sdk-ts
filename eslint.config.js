@@ -6,6 +6,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     rules: {
+      curly: ['error', 'all'],
       quotes: ['error', 'single', { avoidEscape: true }],
       'prefer-arrow-callback': 'error',
       'func-style': ['error', 'expression'],

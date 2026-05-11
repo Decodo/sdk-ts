@@ -18,7 +18,7 @@ npm install @decodo/sdk-ts
 ## Quick start
 
 ```typescript
-import { DecodoClient } from "@decodo/sdk-ts";
+import { DecodoClient, Target } from "@decodo/sdk-ts";
 
 const client = new DecodoClient({
   webScrapingApi: {
@@ -27,7 +27,7 @@ const client = new DecodoClient({
 });
 
 const result = await client.webScrapingApi.scrape({
-  target: "google_search",
+  target: Target.GoogleSearch,
   query: "coffee shops",
   geo: "United States",
   parse: true,
@@ -50,13 +50,19 @@ const client = new DecodoClient({
 
 Access via `client.webScrapingApi`.
 
+The snippets below assume you have already imported `Target` (and `DecodoClient` where a client is constructed), for example:
+
+```typescript
+import { DecodoClient, Target } from "@decodo/sdk-ts";
+```
+
 ### Sync scrape
 
 Blocks until the scraping result is ready:
 
 ```typescript
 const result = await client.webScrapingApi.scrape({
-  target: "amazon_product",
+  target: Target.AmazonProduct,
   query: "B09H74FXNW",
   parse: true,
 });
@@ -68,7 +74,7 @@ Creates a task and returns immediately. Poll separately for results:
 
 ```typescript
 const task = await client.webScrapingApi.scrapeAsync({
-  target: "google_search",
+  target: Target.GoogleSearch,
   query: "laptop reviews",
 });
 
@@ -84,7 +90,7 @@ Send multiple URLs or queries in a single request:
 
 ```typescript
 const batch = await client.webScrapingApi.scrapeBatch({
-  target: "google_search",
+  target: Target.GoogleSearch,
   query: ["coffee", "tea", "juice"],
 });
 console.log(batch.id);
@@ -101,11 +107,12 @@ import {
   RateLimitError,
   ValidationError,
   TimeoutError,
+  Target,
 } from "@decodo/sdk-ts";
 
 try {
   await client.webScrapingApi.scrape({
-    target: "google_search",
+    target: Target.GoogleSearch,
     query: "test",
   });
 } catch (err) {
@@ -128,7 +135,7 @@ All target parameters are strongly typed. Your IDE will autocomplete only the pa
 
 ```typescript
 await client.webScrapingApi.scrape({
-  target: "google_search",
+  target: Target.GoogleSearch,
   query: "test", // ok
   geo: "US", // ok
   // product_id: '...'  // type error — not valid for google_search
@@ -138,12 +145,12 @@ await client.webScrapingApi.scrape({
 You can also introspect target metadata at runtime:
 
 ```typescript
-import { targets, targetMeta, parameterMeta } from "@decodo/sdk-ts";
+import { targets, targetMeta, parameterMeta, Target } from "@decodo/sdk-ts";
 
 console.log(targets);
-// ['google_search', 'amazon_product', ...]
+// [Target.GoogleSearch, Target.AmazonProduct, ...] (string enum values serialize as API strings)
 
-console.log(targetMeta["google_search"].parameters);
+console.log(targetMeta[Target.GoogleSearch].parameters);
 // ['query', 'headless', 'locale', 'geo', ...]
 
 console.log(parameterMeta["query"]);

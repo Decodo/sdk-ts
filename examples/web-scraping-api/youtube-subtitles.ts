@@ -1,4 +1,4 @@
-import { DecodoClient, type ScrapeRequest } from '@decodo/sdk-ts';
+import { DecodoClient, Target, type ScrapeRequest } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
@@ -7,10 +7,10 @@ const client = new DecodoClient({
 });
 
 const req: ScrapeRequest = {
-  target: 'google_search',
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.YoutubeSubtitles,
+  query: '1234567890',
+  language_code: 'en',
+  subtitle_origin: 'youtube',
 };
 
 const res = await client.webScrapingApi.scrape(req);

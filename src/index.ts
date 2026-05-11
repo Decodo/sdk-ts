@@ -3,13 +3,17 @@ export type { DecodoConfig } from './client.js';
 export { WebScrapingApi } from './api/web-scraping-api.js';
 
 export type {
-  Target,
+  TargetString,
   TargetParamsMap,
   TargetMeta,
   ScrapeRequest,
   BatchRequest,
 } from './generated/targets.js';
-export { targets, targetMeta } from './generated/targets.js';
+export {
+  targets,
+  targetMeta,
+  Target,
+} from './generated/targets.js';
 export { parameterMeta } from './generated/parameters.js';
 export type { ParameterMeta } from './generated/parameters.js';
 

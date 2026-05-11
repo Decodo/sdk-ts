@@ -62,7 +62,9 @@ export class HttpClient {
       const res = await fetch(url, init);
 
       if (res.ok) {
-        if (res.status === 204) return undefined as T;
+        if (res.status === 204) {
+          return undefined as T;
+        }
         return (await res.json()) as T;
       }
 
@@ -86,7 +88,9 @@ export class HttpClient {
       }
       throw new DecodoError(message, res.status, errorBody?.status);
     } catch (err) {
-      if (err instanceof DecodoError) throw err;
+      if (err instanceof DecodoError) {
+        throw err;
+      }
       if (
         err instanceof TypeError &&
         (err as TypeError & { cause?: { code?: string } }).cause?.code ===
@@ -115,7 +119,9 @@ export class HttpClient {
     if (query) {
       const params = new URLSearchParams(query);
       const qs = params.toString();
-      if (qs) return this.request<T>('GET', `${path}?${qs}`);
+      if (qs) {
+        return this.request<T>('GET', `${path}?${qs}`);
+      }
     }
     return this.request<T>('GET', path);
   }

@@ -61,6 +61,15 @@ const toPascalCase = (s: string): string =>
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join('');
 
+/** PascalCase identifier safe for `enum Target { … }` members (e.g. keys starting with digits). */
+const toEnumMemberName = (targetKey: string): string => {
+  const pascal = toPascalCase(targetKey);
+  if (/^[0-9]/.test(pascal) || !/^[A-Za-z_$]/.test(pascal)) {
+    return `_${pascal}`;
+  }
+  return pascal;
+};
+
 const isValidIdentifier = (key: string): boolean =>
   /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key);
 
@@ -97,7 +106,9 @@ const buildTargetParamsSchema = (api: IRApi, target: IRTarget): JSONSchema4 => {
   const properties: Record<string, JSONSchema4> = {};
   for (const paramKey of target.parameters) {
     const param = api.parameters[paramKey];
-    if (!param) continue;
+    if (!param) {
+      continue;
+    }
     properties[paramKey] = parameterToJsonSchema(param);
   }
   return {
@@ -107,7 +118,6 @@ const buildTargetParamsSchema = (api: IRApi, target: IRTarget): JSONSchema4 => {
   };
 };
 
-// todo: convert to enum using a lib
 const generateTargetsFile = async (api: IRApi): Promise<string> => {
   const lines: string[] = [];
 
@@ -115,16 +125,25 @@ const generateTargetsFile = async (api: IRApi): Promise<string> => {
   lines.push('');
 
   const targetKeys = Object.keys(api.targets);
+  lines.push('export enum Target {');
+  for (const targetKey of targetKeys) {
+    lines.push(
+      `  ${toEnumMemberName(targetKey)} = ${JSON.stringify(targetKey)},`,
+    );
+  }
+  lines.push('}');
+  lines.push('');
   lines.push(
-    `export type Target = ${targetKeys
-      .map((k) => JSON.stringify(k))
-      .join(' | ')};`,
+    '/** API discriminator string literals (same values as {@link Target}). */',
+  );
+  lines.push(
+    'export type TargetString = (typeof Target)[keyof typeof Target];',
   );
   lines.push('');
 
   lines.push(
     `export const targets = [${targetKeys
-      .map((k) => JSON.stringify(k))
+      .map((k) => `Target.${toEnumMemberName(k)}`)
       .join(', ')}] as const;`,
   );
   lines.push('');
@@ -140,21 +159,23 @@ const generateTargetsFile = async (api: IRApi): Promise<string> => {
   lines.push('export type TargetParamsMap = {');
   for (const targetKey of targetKeys) {
     const typeName = `${toPascalCase(targetKey)}Params`;
-    lines.push(`  ${JSON.stringify(targetKey)}: ${typeName};`);
+    lines.push(`  [Target.${toEnumMemberName(targetKey)}]: ${typeName};`);
   }
   lines.push('};');
   lines.push('');
 
   lines.push('export type ScrapeRequest = {');
-  lines.push('  [T in Target]: { target: T } & TargetParamsMap[T];');
-  lines.push('}[Target];');
+  lines.push(
+    '  [T in TargetString]: { target: T } & TargetParamsMap[T];',
+  );
+  lines.push('}[TargetString];');
   lines.push('');
 
   lines.push('export type BatchRequest = {');
   lines.push(
-    '  [T in Target]: { target: T; url?: string[]; query?: string[] } & Omit<TargetParamsMap[T], "url" | "query">;',
+    '  [T in TargetString]: { target: T; url?: string[]; query?: string[] } & Omit<TargetParamsMap[T], "url" | "query">;',
   );
-  lines.push('}[Target];');
+  lines.push('}[TargetString];');
   lines.push('');
 
   lines.push('export type TargetMeta = {');
@@ -165,7 +186,7 @@ const generateTargetsFile = async (api: IRApi): Promise<string> => {
   lines.push('');
   lines.push('export const targetMeta: Record<Target, TargetMeta> = {');
   for (const [targetKey, target] of Object.entries(api.targets)) {
-    lines.push(`  ${JSON.stringify(targetKey)}: {`);
+    lines.push(`  [Target.${toEnumMemberName(targetKey)}]: {`);
     lines.push(`    group: ${JSON.stringify(target.group)},`);
     lines.push(`    responseFormat: ${JSON.stringify(target.responseFormat)},`);
     lines.push(
@@ -201,16 +222,23 @@ const generateParametersFile = (api: IRApi): string => {
   for (const [key, param] of Object.entries(api.parameters)) {
     const parts: string[] = [];
     parts.push(`type: ${JSON.stringify(param.type)}`);
-    if (param.maxLength !== undefined)
+    if (param.maxLength !== undefined) {
       parts.push(`maxLength: ${param.maxLength}`);
-    if (param.min !== undefined) parts.push(`min: ${param.min}`);
-    if (param.max !== undefined) parts.push(`max: ${param.max}`);
-    if (param.enum)
+    }
+    if (param.min !== undefined) {
+      parts.push(`min: ${param.min}`);
+    }
+    if (param.max !== undefined) {
+      parts.push(`max: ${param.max}`);
+    }
+    if (param.enum) {
       parts.push(
         `enum: [${param.enum.map((v) => JSON.stringify(v)).join(', ')}]`,
       );
-    if (param.items)
+    }
+    if (param.items) {
       parts.push(`items: { type: ${JSON.stringify(param.items.type)} }`);
+    }
     lines.push(`  ${propKey(key)}: { ${parts.join(', ')} },`);
   }
   lines.push('};');
