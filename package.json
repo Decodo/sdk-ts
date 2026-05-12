@@ -22,7 +22,7 @@
     "build"
   ],
   "scripts": {
-    "codegen": "tsx codegen/generate-from-ir.ts",
+    "codegen": "tsx codegen/codegen.ts",
     "build": "pnpm run codegen && pnpm run build:esm && pnpm run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.build.cjs.json",
