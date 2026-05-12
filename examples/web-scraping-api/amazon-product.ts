@@ -1,20 +1,16 @@
-import { DecodoClient, Target, type ScrapeRequest } from '@decodo/sdk-ts';
+import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
-    token: 'VTAwMDAxNzk1MDc6UFcxMDcxZGQ3Yzg2ZjM5MjA1YjQ4NjNhZjk1OGMxMGUxNGY=',
+    token: '<web_api_token>',
   },
 });
 
-const req: ScrapeRequest = {
+const res = await client.webScrapingApi.scrape({
   target: Target.AmazonProduct,
   query: 'B09H74FXNW',
   parse: true,
-};
-
-const res = await client.webScrapingApi.scrape(req);
+});
 
 const firstResult = res.results[0];
-console.log('status_code:', firstResult?.status_code);
-console.log('task_id:', firstResult?.task_id);
-console.log('content (preview):', firstResult.content);
+console.log(JSON.stringify(firstResult.content, null, 2));

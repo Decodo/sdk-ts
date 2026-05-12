@@ -1,16 +1,9 @@
-export type IRParameter = {
-  type: string;
-  maxLength?: number;
-  min?: number;
-  max?: number;
-  enum?: (string | number)[];
-  items?: { type: string };
-};
+import type { JSONSchema4 } from 'json-schema';
 
 export type IRTarget = {
   group: string;
-  responseFormat: string;
-  parameters: string[];
+  response_format: string;
+  parameter_schema: JSONSchema4;
 };
 
 export type WebScrapingApiIR = {
@@ -21,6 +14,5 @@ export type WebScrapingApiIR = {
     string,
     { method: string; path: string; description: string }
   >;
-  parameters: Record<string, IRParameter>;
   targets: Record<string, IRTarget>;
 };

@@ -38,6 +38,11 @@ export enum Target {
   UniversalCore = 'universal_core',
   Chatgpt = 'chatgpt',
   Perplexity = 'perplexity',
+  Bbb = 'bbb',
+  Autotrader = 'autotrader',
+  Mobile = 'mobile',
+  Airbnb = 'airbnb',
+  AppleAppStore = 'apple_app_store',
   InstagramGraphqlProfile = 'instagram_graphql_profile',
   TiktokPost = 'tiktok_post',
   TiktokShopSearch = 'tiktok_shop_search',
@@ -59,7 +64,7 @@ export enum Target {
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.EcommerceCore, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.UniversalCore, Target.Chatgpt, Target.Perplexity, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel, Target.SiteUnblocker, Target.SiteUnblockerReq] as const;
+export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.EcommerceCore, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.UniversalCore, Target.Chatgpt, Target.Perplexity, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel, Target.SiteUnblocker, Target.SiteUnblockerReq] as const;
 
 export interface UniversalEcommerceParams {
   callback_url?: string;
@@ -457,10 +462,10 @@ export interface UniversalParams {
   session_id?: string;
   successful_status_codes?: number[];
   headers?: {
-    [k: string]: string;
+    [k: string]: unknown;
   };
   cookies?: {
-    [k: string]: string;
+    [k: string]: unknown;
   };
   force_headers?: boolean;
   force_cookies?: boolean;
@@ -492,6 +497,56 @@ export interface ChatgptParams {
 export interface PerplexityParams {
   prompt?: string;
   parse?: boolean;
+  geo?: string;
+  device_type?: string;
+  markdown?: boolean;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
+export interface BbbParams {
+  url?: string;
+  headless?: 'html' | 'png';
+  geo?: string;
+  device_type?: string;
+  markdown?: boolean;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
+export interface AutotraderParams {
+  url?: string;
+  headless?: 'html' | 'png';
+  geo?: string;
+  device_type?: string;
+  markdown?: boolean;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
+export interface MobileParams {
+  url?: string;
+  headless?: 'html' | 'png';
+  geo?: string;
+  device_type?: string;
+  markdown?: boolean;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
+export interface AirbnbParams {
+  url?: string;
+  headless?: 'html' | 'png';
+  geo?: string;
+  device_type?: string;
+  markdown?: boolean;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
+export interface AppleAppStoreParams {
+  url?: string;
+  headless?: 'html' | 'png';
   geo?: string;
   device_type?: string;
   markdown?: boolean;
@@ -635,7 +690,7 @@ export interface SiteUnblockerParams {
   requestBody?: string;
   headless?: 'html' | 'png';
   headers?: {
-    [k: string]: string;
+    [k: string]: unknown;
   };
   force_headers?: boolean;
   force_cookies?: boolean;
@@ -654,7 +709,7 @@ export interface SiteUnblockerReqParams {
   requestBody?: string;
   headless?: 'html' | 'png';
   headers?: {
-    [k: string]: string;
+    [k: string]: unknown;
   };
   force_headers?: boolean;
   force_cookies?: boolean;
@@ -698,6 +753,11 @@ export type TargetParamsMap = {
   [Target.UniversalCore]: UniversalCoreParams;
   [Target.Chatgpt]: ChatgptParams;
   [Target.Perplexity]: PerplexityParams;
+  [Target.Bbb]: BbbParams;
+  [Target.Autotrader]: AutotraderParams;
+  [Target.Mobile]: MobileParams;
+  [Target.Airbnb]: AirbnbParams;
+  [Target.AppleAppStore]: AppleAppStoreParams;
   [Target.InstagramGraphqlProfile]: InstagramGraphqlProfileParams;
   [Target.TiktokPost]: TiktokPostParams;
   [Target.TiktokShopSearch]: TiktokShopSearchParams;
@@ -726,259 +786,284 @@ export type BatchRequest = {
 
 export type TargetMeta = {
   group: string;
-  responseFormat: string;
+  response_format: string;
   parameters: string[];
 };
 
 export const targetMeta: Record<Target, TargetMeta> = {
   [Target.UniversalEcommerce]: {
     group: "None",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["callback_url"],
   },
   [Target.GoogleSearch]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "google_results_language", "google_tbm", "google_tbs", "parse", "google_nfpr", "google_safe_search", "session_id", "xhr", "markdown", "page_count", "callback_url"],
   },
   [Target.GoogleTravelHotels]: {
     group: "Google",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["query", "headless", "locale", "device_type", "page_from", "date_range", "stars", "adults", "children", "session_id", "markdown", "callback_url"],
   },
   [Target.GoogleTrendsExplore]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "geo", "device_type", "search_type", "date_start", "date_end", "callback_url"],
   },
   [Target.GoogleShoppingSearch]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "google_tbs", "parse", "session_id", "google_results_language", "markdown", "callback_url"],
   },
   [Target.GoogleShoppingProduct]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "parse", "session_id", "google_results_language", "markdown", "xhr", "callback_url"],
   },
   [Target.Google]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "headless", "locale", "device_type", "parse", "session_id", "markdown", "xhr", "page_count", "callback_url"],
   },
   [Target.GoogleSuggest]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "device_type", "geo", "locale", "session_id", "callback_url"],
   },
   [Target.GoogleMaps]: {
     group: "Google",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["query", "headless", "geo", "locale", "page_from", "device_type", "session_id", "google_results_language", "google_nfpr", "hotel_occupancy", "date_range", "markdown", "callback_url"],
   },
   [Target.GoogleAiMode]: {
     group: "AI Tools",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "geo", "parse", "device_type", "session_id", "markdown", "xhr", "callback_url"],
   },
   [Target.GoogleAds]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "google_results_language", "google_tbm", "google_tbs", "parse", "google_nfpr", "session_id", "markdown", "xhr", "page_count", "callback_url"],
   },
   [Target.GoogleLens]: {
     group: "Google",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "parse", "device_type", "markdown", "callback_url"],
   },
   [Target.BingSearch]: {
     group: "Bing",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "geo", "domain", "device_type", "page_from", "parse", "page_count", "session_id", "markdown", "xhr", "callback_url"],
   },
   [Target.Bing]: {
     group: "Bing",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "headless", "locale", "geo", "device_type", "page_from", "parse", "session_id", "markdown", "xhr", "callback_url"],
   },
   [Target.YoutubeTranscript]: {
     group: "YouTube",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "language_code", "transcript_origin", "callback_url"],
   },
   [Target.AmazonProduct]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "domain", "device_type", "parse", "autoselect_variant", "geo", "session_id", "currency", "markdown", "xhr", "callback_url"],
   },
   [Target.AmazonPricing]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "domain", "device_type", "page_from", "parse", "geo", "session_id", "currency", "markdown", "xhr", "callback_url"],
   },
   [Target.AmazonSearch]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "domain", "device_type", "page_from", "category", "merchant", "parse", "geo", "session_id", "sort_by", "currency", "markdown", "xhr", "callback_url"],
   },
   [Target.AmazonSellers]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "locale", "domain", "device_type", "geo", "parse", "markdown", "xhr", "callback_url"],
   },
   [Target.AmazonBestsellers]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "domain", "device_type", "geo", "page_from", "category", "parse", "session_id", "currency", "markdown", "xhr", "callback_url"],
   },
   [Target.Amazon]: {
     group: "Amazon",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "headless", "device_type", "parse", "geo", "session_id", "markdown", "xhr", "callback_url"],
   },
   [Target.Ecommerce]: {
     group: "Other eCommerce",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "headless", "locale", "geo", "device_type", "parse", "parser_type", "callback_url"],
   },
   [Target.EcommerceCore]: {
     group: "None",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "payload", "geo", "http_method", "successful_status_codes", "callback_url"],
   },
   [Target.WalmartProduct]: {
     group: "Walmart",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["product_id", "headless", "parse", "xhr", "markdown", "fulfillment_type", "walmart_store_id", "delivery_zip", "callback_url"],
   },
   [Target.WalmartSearch]: {
     group: "Walmart",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "parse", "markdown", "fulfillment_type", "walmart_store_id", "delivery_zip", "callback_url"],
   },
   [Target.Walmart]: {
     group: "Walmart",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "headless", "locale", "geo", "device_type", "store_id", "markdown", "xhr", "callback_url"],
   },
   [Target.TargetProduct]: {
     group: "Target",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["product_id", "headless", "parse", "device_type", "markdown", "xhr", "delivery_type", "target_store_id", "delivery_zip", "callback_url"],
   },
   [Target.TargetSearch]: {
     group: "Target",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "headless", "parse", "device_type", "delivery_type", "target_store_id", "delivery_zip", "xhr", "markdown", "callback_url"],
   },
   [Target.Target]: {
     group: "Target",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "headless", "device_type", "xhr", "delivery_zip", "target_store_id", "callback_url"],
   },
   [Target.LowesSearch]: {
     group: "Lowe's",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "lowes_store_id", "headless", "delivery_zip", "user_agent_type", "free_delivery", "pickup_today", "delivery_today_tomorrow", "callback_url"],
   },
   [Target.Universal]: {
     group: "Universal",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "payload", "proxy_pool", "http_method", "headless", "geo", "locale", "device_type", "session_id", "successful_status_codes", "headers", "cookies", "force_headers", "force_cookies", "xhr", "markdown", "callback_url"],
   },
   [Target.UniversalCore]: {
     group: "None",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "payload", "geo", "http_method", "successful_status_codes", "callback_url"],
   },
   [Target.Chatgpt]: {
     group: "AI Tools",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["prompt", "search", "parse", "geo", "device_type", "markdown", "xhr", "callback_url"],
   },
   [Target.Perplexity]: {
     group: "AI Tools",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["prompt", "parse", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.Bbb]: {
+    group: "Business Reviews",
+    response_format: "html",
+    parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.Autotrader]: {
+    group: "Marketplace",
+    response_format: "html",
+    parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.Mobile]: {
+    group: "Marketplace",
+    response_format: "html",
+    parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.Airbnb]: {
+    group: "Travel",
+    response_format: "html",
+    parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.AppleAppStore]: {
+    group: "Marketplace",
+    response_format: "html",
+    parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
   },
   [Target.InstagramGraphqlProfile]: {
     group: "Instagram",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "callback_url"],
   },
   [Target.TiktokPost]: {
     group: "TikTok",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "xhr", "callback_url"],
   },
   [Target.TiktokShopSearch]: {
     group: "TikTok",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["query", "headless", "device_type", "markdown", "country", "callback_url"],
   },
   [Target.TiktokShopProduct]: {
     group: "TikTok",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["product_id", "headless", "device_type", "xhr", "markdown", "country", "callback_url"],
   },
   [Target.Tiktok]: {
     group: "TikTok",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "headless", "user_agent_type", "callback_url"],
   },
   [Target.RedditPost]: {
     group: "Reddit",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "locale", "geo", "callback_url"],
   },
   [Target.RedditSubreddit]: {
     group: "Reddit",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "locale", "geo", "callback_url"],
   },
   [Target.RedditUser]: {
     group: "Reddit",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["url", "locale", "geo", "sort", "callback_url"],
   },
   [Target.YoutubeVideo]: {
     group: "None",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "geo", "callback_url"],
   },
   [Target.YoutubeMetadata]: {
     group: "YouTube",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "callback_url"],
   },
   [Target.YoutubeSearch]: {
     group: "YouTube",
-    responseFormat: "json",
-    parameters: ["query", "upload_date", "type", "duration", "video_sort_by", "360", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "callback_url"],
+    response_format: "json",
+    parameters: ["360", "query", "upload_date", "type", "duration", "video_sort_by", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "callback_url"],
   },
   [Target.YoutubeSearchMax]: {
     group: "YouTube",
-    responseFormat: "json",
-    parameters: ["query", "upload_date", "type", "duration", "video_sort_by", "360", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "markdown", "callback_url"],
+    response_format: "json",
+    parameters: ["360", "query", "upload_date", "type", "duration", "video_sort_by", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "markdown", "callback_url"],
   },
   [Target.YoutubeSubtitles]: {
     group: "YouTube",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "language_code", "subtitle_origin", "callback_url"],
   },
   [Target.YoutubeChannel]: {
     group: "YouTube",
-    responseFormat: "json",
+    response_format: "json",
     parameters: ["query", "parse", "limit", "markdown", "callback_url"],
   },
   [Target.SiteUnblocker]: {
     group: "None",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "geo", "locale", "session_id", "http_method", "customStatusCode", "requestBody", "headless", "headers", "force_headers", "force_cookies", "customCookies", "markdown", "callback_url"],
   },
   [Target.SiteUnblockerReq]: {
     group: "None",
-    responseFormat: "html",
+    response_format: "html",
     parameters: ["url", "geo", "locale", "session_id", "http_method", "customStatusCode", "requestBody", "headless", "headers", "force_headers", "force_cookies", "customCookies", "markdown", "callback_url"],
   },
 };

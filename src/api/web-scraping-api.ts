@@ -1,4 +1,7 @@
+import { prettifyError } from 'zod';
 import { HttpClient } from '../http.js';
+import { ValidationError } from '../errors.js';
+import { requestSchemas } from '../generated/request-schemas.js';
 import type { ScrapeRequest, BatchRequest } from '../generated/targets.js';
 import type {
   SyncResponse,
@@ -15,11 +18,24 @@ export class WebScrapingApi {
     this.http = http;
   }
 
+  private validate(params: ScrapeRequest): void {
+    const schema = requestSchemas[params.target];
+    if (!schema) {
+      return;
+    }
+    const parsed = schema.safeParse(params);
+    if (!parsed.success) {
+      throw new ValidationError(prettifyError(parsed.error));
+    }
+  }
+
   async scrape(params: ScrapeRequest): Promise<SyncResponse> {
+    this.validate(params);
     return this.http.post<SyncResponse>('/v2/scrape', params);
   }
 
   async scrapeAsync(params: ScrapeRequest): Promise<AsyncTaskResponse> {
+    this.validate(params);
     return this.http.post<AsyncTaskResponse>('/v3/task', params);
   }
 

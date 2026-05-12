@@ -3,15 +3,22 @@ import { resolve } from 'node:path';
 import { compile } from 'json-schema-to-typescript';
 import {
   getTargetEnumSchema,
-  getTargetParamsSchema,
   compileOpts,
   fetchIntermediateRepresentation,
-  IR_URL,
+  localIrPath,
   outDir,
+  stripTargetProperty,
   toEnumMemberName,
   toPascalCase,
 } from './shared.js';
 import { WebScrapingApiIR } from './types';
+
+const getTargetParameterKeys = (
+  parameterSchema: WebScrapingApiIR['targets'][string]['parameter_schema'],
+): string[] => {
+  const properties = parameterSchema.properties ?? {};
+  return Object.keys(properties).filter((k) => k !== 'target');
+};
 
 const getTargetsFileContents = async (
   api: WebScrapingApiIR,
@@ -48,8 +55,8 @@ const getTargetsFileContents = async (
 
   for (const [targetKey, target] of Object.entries(api.targets)) {
     const typeName = `${toPascalCase(targetKey)}Params`;
-    const schema = getTargetParamsSchema(api, target);
-    const block = await compile(schema, typeName, compileOpts);
+    const paramsSchema = stripTargetProperty(target.parameter_schema);
+    const block = await compile(paramsSchema, typeName, compileOpts);
     lines.push(block.trimEnd());
     lines.push('');
   }
@@ -76,7 +83,7 @@ const getTargetsFileContents = async (
 
   lines.push('export type TargetMeta = {');
   lines.push('  group: string;');
-  lines.push('  responseFormat: string;');
+  lines.push('  response_format: string;');
   lines.push('  parameters: string[];');
   lines.push('};');
   lines.push('');
@@ -84,9 +91,11 @@ const getTargetsFileContents = async (
   for (const [targetKey, target] of Object.entries(api.targets)) {
     lines.push(`  [Target.${toEnumMemberName(targetKey)}]: {`);
     lines.push(`    group: ${JSON.stringify(target.group)},`);
-    lines.push(`    responseFormat: ${JSON.stringify(target.responseFormat)},`);
     lines.push(
-      `    parameters: [${target.parameters
+      `    response_format: ${JSON.stringify(target.response_format)},`,
+    );
+    lines.push(
+      `    parameters: [${getTargetParameterKeys(target.parameter_schema)
         .map((p) => JSON.stringify(p))
         .join(', ')}],`,
     );
@@ -106,7 +115,7 @@ export const generateTargetsFile = async () => {
 
   writeFileSync(resolve(outDir, 'targets.ts'), fileContents);
 
-  console.log(`Generated targets from ${IR_URL}:`);
+  console.log(`Generated targets from ${localIrPath}:`);
 
   console.log(
     `  ${resolve(outDir, 'targets.ts')} (${Object.keys(ir.apis.webScrapingApi.targets).length} targets)`,

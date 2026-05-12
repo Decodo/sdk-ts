@@ -1,14 +1,12 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { JSONSchema4 } from 'json-schema';
 import { IR } from '../types';
-import { IRParameter, IRTarget, WebScrapingApiIR } from './types';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// todo: update to permanent IR location
-export const IR_URL =
-  'https://gist.githubusercontent.com/domantas-jurkus-dcd/43c47a102bcdf97842814d635ba47f05/raw/3b9e4a35f05ada3f8ed4410376f59ad89b4e6535/config.json';
+export const localIrPath = resolve(__dirname, '../../inputs/decodo.ir.json');
 
 export const outDir = resolve(__dirname, '../../src/generated');
 
@@ -45,51 +43,6 @@ const isValidIdentifier = (key: string): boolean =>
 export const propKey = (key: string): string =>
   isValidIdentifier(key) ? key : JSON.stringify(key);
 
-export const parameterToJsonSchema = (param: IRParameter): JSONSchema4 => {
-  const type = param.type as JSONSchema4['type'];
-  const schema: JSONSchema4 = { type };
-
-  if (param.maxLength !== undefined) {
-    schema.maxLength = param.maxLength;
-  }
-  if (param.min !== undefined) {
-    schema.minimum = param.min;
-  }
-  if (param.max !== undefined) {
-    schema.maximum = param.max;
-  }
-  if (param.enum) {
-    schema.enum = param.enum;
-  }
-  if (param.type === 'array' && param.items) {
-    schema.items = parameterToJsonSchema(param.items as IRParameter);
-  }
-  if (param.type === 'object') {
-    schema.additionalProperties = { type: 'string' };
-  }
-
-  return schema;
-};
-
-export const getTargetParamsSchema = (
-  api: WebScrapingApiIR,
-  target: IRTarget,
-): JSONSchema4 => {
-  const properties: Record<string, JSONSchema4> = {};
-  for (const paramKey of target.parameters) {
-    const param = api.parameters[paramKey];
-    if (!param) {
-      continue;
-    }
-    properties[paramKey] = parameterToJsonSchema(param);
-  }
-  return {
-    type: 'object',
-    properties,
-    additionalProperties: false,
-  };
-};
-
 export const getTargetEnumSchema = (targetKeys: string[]): JSONSchema4 =>
   ({
     title: 'Target',
@@ -99,14 +52,26 @@ export const getTargetEnumSchema = (targetKeys: string[]): JSONSchema4 =>
     tsEnumNames: targetKeys.map(toEnumMemberName),
   }) as JSONSchema4;
 
+export const stripTargetProperty = (schema: JSONSchema4): JSONSchema4 => {
+  const properties = { ...(schema.properties ?? {}) };
+  delete properties.target;
+  const required = Array.isArray(schema.required)
+    ? schema.required.filter((r) => r !== 'target')
+    : undefined;
+  const result: JSONSchema4 = { ...schema, properties };
+  if (required && required.length > 0) {
+    result.required = required;
+  } else {
+    delete result.required;
+  }
+  return result;
+};
+
 export const fetchIntermediateRepresentation = async (): Promise<IR> => {
-  const res = await fetch(IR_URL);
-  if (!res.ok) {
+  if (!existsSync(localIrPath)) {
     throw new Error(
-      `Failed to fetch IR: ${res.status} ${res.statusText} (${IR_URL})`,
+      `IR file not found: ${localIrPath}. Add inputs/decodo.ir.json or update localIrPath.`,
     );
   }
-  const ir = (await res.json()) as IR;
-
-  return ir;
+  return JSON.parse(readFileSync(localIrPath, 'utf-8')) as IR;
 };

@@ -1,12 +1,85 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import type { JSONSchema4 } from 'json-schema';
 import {
   fetchIntermediateRepresentation,
-  IR_URL,
+  localIrPath,
   outDir,
   propKey,
 } from './shared.js';
 import { WebScrapingApiIR } from './types';
+
+type ParameterMeta = {
+  type: string;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  enum?: (string | number)[];
+  items?: { type: string };
+};
+
+const toParameterMeta = (schema: JSONSchema4): ParameterMeta => {
+  const meta: ParameterMeta = { type: schema.type as string };
+  if (schema.maxLength !== undefined) {
+    meta.maxLength = schema.maxLength;
+  }
+  if (schema.minimum !== undefined) {
+    meta.minimum = schema.minimum;
+  }
+  if (schema.maximum !== undefined) {
+    meta.maximum = schema.maximum;
+  }
+  if (Array.isArray(schema.enum)) {
+    meta.enum = schema.enum as (string | number)[];
+  }
+  if (schema.type === 'array' && schema.items) {
+    const items = Array.isArray(schema.items) ? schema.items[0] : schema.items;
+    if (items && typeof items === 'object' && 'type' in items) {
+      meta.items = { type: String(items.type) };
+    }
+  }
+  return meta;
+};
+
+const formatParameterMeta = (meta: ParameterMeta): string => {
+  const parts: string[] = [];
+  parts.push(`type: ${JSON.stringify(meta.type)}`);
+  if (meta.maxLength !== undefined) {
+    parts.push(`maxLength: ${meta.maxLength}`);
+  }
+  if (meta.minimum !== undefined) {
+    parts.push(`minimum: ${meta.minimum}`);
+  }
+  if (meta.maximum !== undefined) {
+    parts.push(`maximum: ${meta.maximum}`);
+  }
+  if (meta.enum) {
+    parts.push(`enum: [${meta.enum.map((v) => JSON.stringify(v)).join(', ')}]`);
+  }
+  if (meta.items) {
+    parts.push(`items: { type: ${JSON.stringify(meta.items.type)} }`);
+  }
+  return `{ ${parts.join(', ')} }`;
+};
+
+const collectParameterMeta = (
+  api: WebScrapingApiIR,
+): Record<string, ParameterMeta> => {
+  const collected: Record<string, ParameterMeta> = {};
+  for (const target of Object.values(api.targets)) {
+    const properties = target.parameter_schema.properties ?? {};
+    for (const [name, schema] of Object.entries(properties)) {
+      if (name === 'target') {
+        continue;
+      }
+      if (collected[name]) {
+        continue;
+      }
+      collected[name] = toParameterMeta(schema as JSONSchema4);
+    }
+  }
+  return collected;
+};
 
 export const getParametersFile = (api: WebScrapingApiIR): string => {
   const lines: string[] = [];
@@ -19,35 +92,17 @@ export const getParametersFile = (api: WebScrapingApiIR): string => {
   lines.push('export type ParameterMeta = {');
   lines.push('  type: string;');
   lines.push('  maxLength?: number;');
-  lines.push('  min?: number;');
-  lines.push('  max?: number;');
+  lines.push('  minimum?: number;');
+  lines.push('  maximum?: number;');
   lines.push('  enum?: (string | number)[];');
   lines.push('  items?: { type: string };');
   lines.push('};');
   lines.push('');
 
+  const collected = collectParameterMeta(api);
   lines.push('export const parameterMeta: Record<string, ParameterMeta> = {');
-  for (const [key, param] of Object.entries(api.parameters)) {
-    const parts: string[] = [];
-    parts.push(`type: ${JSON.stringify(param.type)}`);
-    if (param.maxLength !== undefined) {
-      parts.push(`maxLength: ${param.maxLength}`);
-    }
-    if (param.min !== undefined) {
-      parts.push(`min: ${param.min}`);
-    }
-    if (param.max !== undefined) {
-      parts.push(`max: ${param.max}`);
-    }
-    if (param.enum) {
-      parts.push(
-        `enum: [${param.enum.map((v) => JSON.stringify(v)).join(', ')}]`,
-      );
-    }
-    if (param.items) {
-      parts.push(`items: { type: ${JSON.stringify(param.items.type)} }`);
-    }
-    lines.push(`  ${propKey(key)}: { ${parts.join(', ')} },`);
+  for (const [key, meta] of Object.entries(collected)) {
+    lines.push(`  ${propKey(key)}: ${formatParameterMeta(meta)},`);
   }
   lines.push('};');
   lines.push('');
@@ -63,11 +118,9 @@ export const generateParametersFile = async () => {
 
   writeFileSync(resolve(outDir, 'parameters.ts'), fileContents);
 
-  console.log(`Generated parameters from ${IR_URL}:`);
-
-  console.log(
-    `  ${resolve(outDir, 'parameters.ts')} (${
-      Object.keys(ir.apis.webScrapingApi.parameters).length
-    } parameters)`,
-  );
+  const count = Object.keys(
+    collectParameterMeta(ir.apis.webScrapingApi),
+  ).length;
+  console.log(`Generated parameters from ${localIrPath}:`);
+  console.log(`  ${resolve(outDir, 'parameters.ts')} (${count} parameters)`);
 };

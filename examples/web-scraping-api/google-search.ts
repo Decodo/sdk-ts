@@ -1,4 +1,4 @@
-import { DecodoClient, Target, type ScrapeRequest } from '@decodo/sdk-ts';
+import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
@@ -6,16 +6,12 @@ const client = new DecodoClient({
   },
 });
 
-const req: ScrapeRequest = {
+const res = await client.webScrapingApi.scrape({
   target: Target.GoogleSearch,
   query: 'shoes',
   geo: 'United States',
   parse: true,
-};
-
-const res = await client.webScrapingApi.scrape(req);
+});
 
 const firstResult = res.results[0];
-console.log('status_code:', firstResult?.status_code);
-console.log('task_id:', firstResult?.task_id);
-console.log('content (preview):', firstResult.content);
+console.log(JSON.stringify(firstResult.content, null, 2));
