@@ -6,9 +6,9 @@ import { IR } from '../types';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export const localIrPath = resolve(__dirname, '../../inputs/decodo.ir.json');
+export const localIrPath = resolve(__dirname, '../../../inputs/decodo.ir.json');
 
-export const outDir = resolve(__dirname, '../../src/generated');
+export const outDir = resolve(__dirname, '../../generated');
 
 export const compileOpts = {
   bannerComment: '',
@@ -56,7 +56,7 @@ export const stripTargetProperty = (schema: JSONSchema4): JSONSchema4 => {
   const properties = { ...(schema.properties ?? {}) };
   delete properties.target;
   const required = Array.isArray(schema.required)
-    ? schema.required.filter((r) => r !== 'target')
+    ? schema.required.filter((r: string) => r !== 'target')
     : undefined;
   const result: JSONSchema4 = { ...schema, properties };
   if (required && required.length > 0) {

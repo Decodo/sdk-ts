@@ -9,7 +9,8 @@
     "resolveJsonModule": true,
     "declaration": true,
     "outDir": "build",
-    "rootDir": "src"
+    "rootDir": "."
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "examples/**/*"],
+  "exclude": ["build/**", "./*.js"]
 }

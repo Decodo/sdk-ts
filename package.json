@@ -22,7 +22,7 @@
     "build"
   ],
   "scripts": {
-    "codegen": "tsx codegen/codegen.ts",
+    "codegen": "tsx src/codegen/codegen.ts",
     "build": "pnpm run codegen && pnpm run build:esm && pnpm run build:cjs",
     "build:esm": "tsc -p tsconfig.build.json",
     "build:cjs": "tsc -p tsconfig.build.cjs.json",
@@ -35,6 +35,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^25.7.0",
     "eslint": "^9.39.1",
     "tsx": "^4.19.0",
     "typescript": "^5.3.3",

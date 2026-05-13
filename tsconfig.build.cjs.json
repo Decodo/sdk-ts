@@ -6,5 +6,6 @@
     "outDir": "build/cjs",
     "declaration": true
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/codegen/**"]
 }
