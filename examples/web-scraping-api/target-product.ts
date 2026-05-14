@@ -7,9 +7,9 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
+  target: Target.TargetProduct,
+  product_id: '92186007',
+  headless: 'html',
   parse: true,
 });
 

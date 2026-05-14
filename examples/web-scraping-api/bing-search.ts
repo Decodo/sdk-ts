@@ -7,10 +7,11 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
+  target: Target.BingSearch,
+  query: 'electric vehicles',
   geo: 'United States',
   parse: true,
+  locale: 'en-US',
 });
 
 console.log(JSON.stringify(res, null, 2));

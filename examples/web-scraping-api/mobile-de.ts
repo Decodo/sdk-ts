@@ -7,10 +7,8 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.Mobile,
+  url: 'https://suchen.mobile.de/fahrzeuge/search.html?dam=false&isSearchRequest=true&ref=quickSearch&s=Car&vc=Car',
 });
 
 console.log(JSON.stringify(res, null, 2));

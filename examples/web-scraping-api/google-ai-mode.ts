@@ -7,9 +7,8 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
+  target: Target.GoogleAiMode,
+  query: 'What are the top three dog breeds?',
   parse: true,
 });
 

@@ -7,10 +7,9 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.Tiktok,
+  url: 'https://www.tiktok.com/@nba/video/7255379108241198378',
+  headless: 'html',
 });
 
 console.log(JSON.stringify(res, null, 2));

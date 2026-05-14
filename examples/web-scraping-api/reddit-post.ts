@@ -7,10 +7,8 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.RedditPost,
+  url: 'https://www.reddit.com/r/nba/comments/17jrqc5/serious_next_day_thread_postgame_discussion/',
 });
 
 console.log(JSON.stringify(res, null, 2));

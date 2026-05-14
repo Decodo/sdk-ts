@@ -7,10 +7,10 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
+  target: Target.GoogleMaps,
+  query: 'coffee shops brooklyn',
   geo: 'United States',
-  parse: true,
+  locale: 'en',
 });
 
 console.log(JSON.stringify(res, null, 2));

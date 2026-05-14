@@ -7,10 +7,9 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.YoutubeSearchMax,
+  query: 'How to care for chinchillas',
+  video_sort_by: 'relevance',
 });
 
 console.log(JSON.stringify(res, null, 2));

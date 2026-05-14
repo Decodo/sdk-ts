@@ -18,18 +18,18 @@ npm install @decodo/sdk-ts
 ## Quick start
 
 ```typescript
-import { DecodoClient, Target } from "@decodo/sdk-ts";
+import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
-    token: "<basic_auth_token>",
+    token: '<basic_auth_token>',
   },
 });
 
 const result = await client.webScrapingApi.scrape({
   target: Target.GoogleSearch,
-  query: "coffee shops",
-  geo: "United States",
+  query: 'coffee shops',
+  geo: 'United States',
   parse: true,
 });
 console.log(result.results[0].content);
@@ -40,7 +40,7 @@ console.log(result.results[0].content);
 ```typescript
 const client = new DecodoClient({
   webScrapingApi: {
-    token: "<basic_auth_token>",
+    token: '<basic_auth_token>',
   },
   timeoutMs: 120_000, // optional, request timeout in ms (default: 180s)
 });
@@ -53,7 +53,7 @@ Access via `client.webScrapingApi`.
 The snippets below assume you have already imported `Target` (and `DecodoClient` where a client is constructed), for example:
 
 ```typescript
-import { DecodoClient, Target } from "@decodo/sdk-ts";
+import { DecodoClient, Target } from '@decodo/sdk-ts';
 ```
 
 ### Sync scrape
@@ -63,7 +63,7 @@ Blocks until the scraping result is ready:
 ```typescript
 const result = await client.webScrapingApi.scrape({
   target: Target.AmazonProduct,
-  query: "B09H74FXNW",
+  query: 'B09H74FXNW',
   parse: true,
 });
 ```
@@ -75,7 +75,8 @@ Creates a task and returns immediately. Poll separately for results:
 ```typescript
 const task = await client.webScrapingApi.scrapeAsync({
   target: Target.GoogleSearch,
-  query: "laptop reviews",
+  query: 'laptop reviews',
+  parse: true,
 });
 
 const meta = await client.webScrapingApi.getStatus(task.id);
@@ -91,7 +92,8 @@ Send multiple URLs or queries in a single request:
 ```typescript
 const batch = await client.webScrapingApi.scrapeBatch({
   target: Target.GoogleSearch,
-  query: ["coffee", "tea", "juice"],
+  query: ['coffee', 'tea', 'juice'],
+  parse: true,
 });
 console.log(batch.id);
 ```
@@ -108,12 +110,13 @@ import {
   ValidationError,
   TimeoutError,
   Target,
-} from "@decodo/sdk-ts";
+} from '@decodo/sdk-ts';
 
 try {
   await client.webScrapingApi.scrape({
     target: Target.GoogleSearch,
-    query: "test",
+    query: 'test',
+    parse: true,
   });
 } catch (err) {
   if (err instanceof AuthenticationError) {
@@ -127,34 +130,6 @@ try {
     // request timed out
   }
 }
-```
-
-## Type-safe targets
-
-All target parameters are strongly typed. Your IDE will autocomplete only the parameters valid for each target:
-
-```typescript
-await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: "test", // ok
-  geo: "US", // ok
-  // product_id: '...'  // type error — not valid for google_search
-});
-```
-
-You can also introspect target metadata at runtime:
-
-```typescript
-import { targets, targetMeta, parameterMeta, Target } from "@decodo/sdk-ts";
-
-console.log(targets);
-// [Target.GoogleSearch, Target.AmazonProduct, ...] (string enum values serialize as API strings)
-
-console.log(targetMeta[Target.GoogleSearch].parameters);
-// ['query', 'headless', 'locale', 'geo', ...]
-
-console.log(parameterMeta["query"]);
-// { type: 'string', maxLength: 2048 }
 ```
 
 ## Requirements

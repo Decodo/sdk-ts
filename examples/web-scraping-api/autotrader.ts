@@ -7,10 +7,8 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
-  parse: true,
+  target: Target.Autotrader,
+  url: 'https://www.autotrader.co.uk/car-search?channel=cars&postcode=SE15+6GY&make=',
 });
 
 console.log(JSON.stringify(res, null, 2));

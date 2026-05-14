@@ -7,10 +7,10 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
+  target: Target.Universal,
+  url: 'https://www.example.com',
   geo: 'United States',
-  parse: true,
+  markdown: true,
 });
 
 console.log(JSON.stringify(res, null, 2));

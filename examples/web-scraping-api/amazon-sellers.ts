@@ -7,9 +7,9 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
+  target: Target.AmazonSellers,
+  query: 'A1R0Z7FJGTKESH',
+  headless: 'html',
   parse: true,
 });
 

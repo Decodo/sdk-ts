@@ -7,10 +7,10 @@ const client = new DecodoClient({
 });
 
 const res = await client.webScrapingApi.scrape({
-  target: Target.GoogleSearch,
-  query: 'shoes',
-  geo: 'United States',
+  target: Target.Perplexity,
+  prompt: 'What are the main causes of seasonal allergies?',
   parse: true,
+  geo: 'United States',
 });
 
 console.log(JSON.stringify(res, null, 2));
