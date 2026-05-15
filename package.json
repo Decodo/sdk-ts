@@ -1,58 +1,49 @@
 {
   "name": "@decodo/sdk-ts",
-  "version": "1.2.0",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Official TypeScript SDK for the Decodo APIs",
   "type": "module",
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
-  "types": "lib/types/index.d.ts",
+  "main": "./build/cjs/index.cjs",
+  "module": "./build/esm/index.js",
+  "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      },
+      "require": {
+        "types": "./build/cjs/index.d.cts",
+        "default": "./build/cjs/index.cjs"
+      }
+    }
+  },
   "files": [
-    "lib/*",
-    "CHANGELOG.md",
-    "README.md"
+    "build"
   ],
   "scripts": {
-    "build": "npm run lint && rm -rf lib && rollup -c",
-    "lint": "npm run lint:es && npm run lint:ts",
-    "lint:es": "eslint .",
-    "lint:ts": "tsc --noEmit",
-    "test": "echo \"No tests specified\" && exit 0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Decodo/sdk-ts.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Decodo/sdk/issues"
-  },
-  "homepage": "https://github.com/Decodo/sdk#readme",
-  "dependencies": {
-    "rollup": "^4.45.1",
-    "typescript": "^5.8.3"
-  },
-  "devDependencies": {
-    "@babel/preset-typescript": "^7.27.1",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-typescript": "^12.1.4",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^11.0.0",
-    "@semantic-release/npm": "^12.0.1",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
-    "eslint": "^8.0.0",
-    "rollup-plugin-dts": "^6.2.1",
-    "semantic-release": "^24.0.0",
-    "tslib": "^2.8.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "codegen": "tsx src/codegen/codegen.ts",
+    "build": "pnpm run codegen && pnpm run build:esm && pnpm run build:cjs",
+    "build:esm": "tsc -p tsconfig.build.json",
+    "build:cjs": "tsc -p tsconfig.build.cjs.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^25.7.0",
+    "eslint": "^9.39.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.40.0"
+  },
+  "dependencies": {
+    "json-schema-to-typescript": "^15.0.4",
+    "zod": "^4"
   }
 }

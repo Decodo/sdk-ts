@@ -1,2 +1,3 @@
-node_modules
-lib
+build/
+node_modules/
+inputs/decodo.ir.json
