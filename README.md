@@ -12,12 +12,38 @@ Features:
 ## Installation
 
 ```bash
-npm install @decodo/sdk-ts
+npm install --save @decodo/sdk-ts
 ```
 
 ## Quick start
 
+```sh
+mkdir scrape-with-decodo
+cd scrape-with-decodo
+
+npm init -y
+npm install --save @decodo/sdk-ts
+
+touch main.js
+```
+
+<details>
+<summary>Optional: prevent module type warning</summary>
+
+Run the following script to switch to ESM modules:
+
+```sh
+node -e "let p=require('./package.json'); p.type='module'; require('fs').writeFileSync('./package.json', JSON.stringify(p, null, 2))"
+```
+
+</details>
+
+<br />
+
+Obtain a basic auth token from the [Decodo dashboard](https://dashboard.decodo.com/welcome) and use it in the following sample:
+
 ```typescript
+// main.js
 import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
@@ -32,7 +58,7 @@ const result = await client.webScrapingApi.scrape({
   geo: 'United States',
   parse: true,
 });
-console.log(result.results[0].content);
+console.log(JSON.stringify(result, null, 2));
 ```
 
 ## Configuration
