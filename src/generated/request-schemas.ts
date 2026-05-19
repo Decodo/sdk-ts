@@ -1065,40 +1065,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.EcommerceCore]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "ecommerce_core"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "payload": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "http_method": {
-        "type": "string"
-      },
-      "successful_status_codes": {
-        "type": "array",
-        "items": {
-          "type": "number"
-        }
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.WalmartProduct]: {
     "type": "object",
     "properties": {
@@ -1467,40 +1433,6 @@ export const requestJsonSchemas = {
       },
       "markdown": {
         "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.UniversalCore]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "universal_core"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "payload": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "http_method": {
-        "type": "string"
-      },
-      "successful_status_codes": {
-        "type": "array",
-        "items": {
-          "type": "number"
-        }
       },
       "callback_url": {
         "type": "string"
@@ -2219,124 +2151,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.SiteUnblocker]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "site_unblocker"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "geo": {
-        "type": "string"
-      },
-      "locale": {
-        "type": "string"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "http_method": {
-        "type": "string"
-      },
-      "customStatusCode": {
-        "type": "string"
-      },
-      "requestBody": {
-        "type": "string"
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "headers": {
-        "type": "object"
-      },
-      "force_headers": {
-        "type": "boolean"
-      },
-      "force_cookies": {
-        "type": "boolean"
-      },
-      "customCookies": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.SiteUnblockerReq]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "site_unblocker_req"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "geo": {
-        "type": "string"
-      },
-      "locale": {
-        "type": "string"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "http_method": {
-        "type": "string"
-      },
-      "customStatusCode": {
-        "type": "string"
-      },
-      "requestBody": {
-        "type": "string"
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "headers": {
-        "type": "object"
-      },
-      "force_headers": {
-        "type": "boolean"
-      },
-      "force_cookies": {
-        "type": "boolean"
-      },
-      "customCookies": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
 } as const;
 
 export const requestSchemas: Record<Target, z.ZodType> = {
@@ -2362,7 +2176,6 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.AmazonBestsellers]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonBestsellers] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Amazon]: z.fromJSONSchema(requestJsonSchemas[Target.Amazon] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Ecommerce]: z.fromJSONSchema(requestJsonSchemas[Target.Ecommerce] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.EcommerceCore]: z.fromJSONSchema(requestJsonSchemas[Target.EcommerceCore] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.WalmartProduct]: z.fromJSONSchema(requestJsonSchemas[Target.WalmartProduct] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.WalmartSearch]: z.fromJSONSchema(requestJsonSchemas[Target.WalmartSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Walmart]: z.fromJSONSchema(requestJsonSchemas[Target.Walmart] as unknown as z.core.JSONSchema.JSONSchema),
@@ -2371,7 +2184,6 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.Target]: z.fromJSONSchema(requestJsonSchemas[Target.Target] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.LowesSearch]: z.fromJSONSchema(requestJsonSchemas[Target.LowesSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Universal]: z.fromJSONSchema(requestJsonSchemas[Target.Universal] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.UniversalCore]: z.fromJSONSchema(requestJsonSchemas[Target.UniversalCore] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Chatgpt]: z.fromJSONSchema(requestJsonSchemas[Target.Chatgpt] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Perplexity]: z.fromJSONSchema(requestJsonSchemas[Target.Perplexity] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Bbb]: z.fromJSONSchema(requestJsonSchemas[Target.Bbb] as unknown as z.core.JSONSchema.JSONSchema),
@@ -2393,6 +2205,4 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.YoutubeSearchMax]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSearchMax] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeSubtitles]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSubtitles] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeChannel]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeChannel] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.SiteUnblocker]: z.fromJSONSchema(requestJsonSchemas[Target.SiteUnblocker] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.SiteUnblockerReq]: z.fromJSONSchema(requestJsonSchemas[Target.SiteUnblockerReq] as unknown as z.core.JSONSchema.JSONSchema),
 };
