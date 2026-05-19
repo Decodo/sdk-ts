@@ -26,7 +26,6 @@ export enum Target {
   AmazonBestsellers = 'amazon_bestsellers',
   Amazon = 'amazon',
   Ecommerce = 'ecommerce',
-  EcommerceCore = 'ecommerce_core',
   WalmartProduct = 'walmart_product',
   WalmartSearch = 'walmart_search',
   Walmart = 'walmart',
@@ -35,7 +34,6 @@ export enum Target {
   Target = 'target',
   LowesSearch = 'lowes_search',
   Universal = 'universal',
-  UniversalCore = 'universal_core',
   Chatgpt = 'chatgpt',
   Perplexity = 'perplexity',
   Bbb = 'bbb',
@@ -56,15 +54,13 @@ export enum Target {
   YoutubeSearch = 'youtube_search',
   YoutubeSearchMax = 'youtube_search_max',
   YoutubeSubtitles = 'youtube_subtitles',
-  YoutubeChannel = 'youtube_channel',
-  SiteUnblocker = 'site_unblocker',
-  SiteUnblockerReq = 'site_unblocker_req'
+  YoutubeChannel = 'youtube_channel'
 }
 
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.EcommerceCore, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.UniversalCore, Target.Chatgpt, Target.Perplexity, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel, Target.SiteUnblocker, Target.SiteUnblockerReq] as const;
+export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
 
 export interface UniversalEcommerceParams {
   callback_url?: string;
@@ -358,15 +354,6 @@ export interface EcommerceParams {
   callback_url?: string;
 }
 
-export interface EcommerceCoreParams {
-  url?: string;
-  payload?: string;
-  geo?: string;
-  http_method?: string;
-  successful_status_codes?: number[];
-  callback_url?: string;
-}
-
 export interface WalmartProductParams {
   product_id?: string;
   headless?: 'html' | 'png';
@@ -471,15 +458,6 @@ export interface UniversalParams {
   force_cookies?: boolean;
   xhr?: boolean;
   markdown?: boolean;
-  callback_url?: string;
-}
-
-export interface UniversalCoreParams {
-  url?: string;
-  payload?: string;
-  geo?: string;
-  http_method?: string;
-  successful_status_codes?: number[];
   callback_url?: string;
 }
 
@@ -680,44 +658,6 @@ export interface YoutubeChannelParams {
   callback_url?: string;
 }
 
-export interface SiteUnblockerParams {
-  url?: string;
-  geo?: string;
-  locale?: string;
-  session_id?: string;
-  http_method?: string;
-  customStatusCode?: string;
-  requestBody?: string;
-  headless?: 'html' | 'png';
-  headers?: {
-    [k: string]: unknown;
-  };
-  force_headers?: boolean;
-  force_cookies?: boolean;
-  customCookies?: string;
-  markdown?: boolean;
-  callback_url?: string;
-}
-
-export interface SiteUnblockerReqParams {
-  url?: string;
-  geo?: string;
-  locale?: string;
-  session_id?: string;
-  http_method?: string;
-  customStatusCode?: string;
-  requestBody?: string;
-  headless?: 'html' | 'png';
-  headers?: {
-    [k: string]: unknown;
-  };
-  force_headers?: boolean;
-  force_cookies?: boolean;
-  customCookies?: string;
-  markdown?: boolean;
-  callback_url?: string;
-}
-
 export type TargetParamsMap = {
   [Target.UniversalEcommerce]: UniversalEcommerceParams;
   [Target.GoogleSearch]: GoogleSearchParams;
@@ -741,7 +681,6 @@ export type TargetParamsMap = {
   [Target.AmazonBestsellers]: AmazonBestsellersParams;
   [Target.Amazon]: AmazonParams;
   [Target.Ecommerce]: EcommerceParams;
-  [Target.EcommerceCore]: EcommerceCoreParams;
   [Target.WalmartProduct]: WalmartProductParams;
   [Target.WalmartSearch]: WalmartSearchParams;
   [Target.Walmart]: WalmartParams;
@@ -750,7 +689,6 @@ export type TargetParamsMap = {
   [Target.Target]: TargetParams;
   [Target.LowesSearch]: LowesSearchParams;
   [Target.Universal]: UniversalParams;
-  [Target.UniversalCore]: UniversalCoreParams;
   [Target.Chatgpt]: ChatgptParams;
   [Target.Perplexity]: PerplexityParams;
   [Target.Bbb]: BbbParams;
@@ -772,8 +710,6 @@ export type TargetParamsMap = {
   [Target.YoutubeSearchMax]: YoutubeSearchMaxParams;
   [Target.YoutubeSubtitles]: YoutubeSubtitlesParams;
   [Target.YoutubeChannel]: YoutubeChannelParams;
-  [Target.SiteUnblocker]: SiteUnblockerParams;
-  [Target.SiteUnblockerReq]: SiteUnblockerReqParams;
 };
 
 export type ScrapeRequest = {
@@ -901,11 +837,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     response_format: "json",
     parameters: ["url", "headless", "locale", "geo", "device_type", "parse", "parser_type", "callback_url"],
   },
-  [Target.EcommerceCore]: {
-    group: "None",
-    response_format: "html",
-    parameters: ["url", "payload", "geo", "http_method", "successful_status_codes", "callback_url"],
-  },
   [Target.WalmartProduct]: {
     group: "Walmart",
     response_format: "html",
@@ -945,11 +876,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "Universal",
     response_format: "html",
     parameters: ["url", "payload", "proxy_pool", "http_method", "headless", "geo", "locale", "device_type", "session_id", "successful_status_codes", "headers", "cookies", "force_headers", "force_cookies", "xhr", "markdown", "callback_url"],
-  },
-  [Target.UniversalCore]: {
-    group: "None",
-    response_format: "html",
-    parameters: ["url", "payload", "geo", "http_method", "successful_status_codes", "callback_url"],
   },
   [Target.Chatgpt]: {
     group: "AI Tools",
@@ -1055,15 +981,5 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "YouTube",
     response_format: "json",
     parameters: ["query", "parse", "limit", "markdown", "callback_url"],
-  },
-  [Target.SiteUnblocker]: {
-    group: "None",
-    response_format: "html",
-    parameters: ["url", "geo", "locale", "session_id", "http_method", "customStatusCode", "requestBody", "headless", "headers", "force_headers", "force_cookies", "customCookies", "markdown", "callback_url"],
-  },
-  [Target.SiteUnblockerReq]: {
-    group: "None",
-    response_format: "html",
-    parameters: ["url", "geo", "locale", "session_id", "http_method", "customStatusCode", "requestBody", "headless", "headers", "force_headers", "force_cookies", "customCookies", "markdown", "callback_url"],
   },
 };
