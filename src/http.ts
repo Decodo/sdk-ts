@@ -51,6 +51,7 @@ export class HttpClient {
           Authorization: this.authHeader,
           'Content-Type': 'application/json',
           Accept: 'application/json',
+          'x-integration': 'sdk-ts',
         },
         signal: controller.signal,
       };
