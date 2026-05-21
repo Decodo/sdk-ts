@@ -1,13 +1,28 @@
-# @decodo/sdk-ts
+# Decodo TypeScript SDK
 
-Official TypeScript SDK for the Decodo Web Scraping API.
+The official TypeScript SDK for the Decodo Web Scraping API.
 
-Features:
+Build strongly typed scraping workflows for search engines, eCommerce platforms, social media, AI tools, and more using the Decodo Web Scraping API.
 
-- Strongly typed per-target parameters with full IDE autocomplete
-- Sync, async, and batch scraping
-- Uses native `fetch`, Node 18+
-- Typed error hierarchy
+- Fully typed targets and parameters with IDE autocomplete
+- Sync, async, and batch scraping methods
+- Native `fetch` support, Node.js 18+
+- Typed error hierarchy for safer integrations
+- Built for TypeScript and modern JavaScript runtimes
+
+# What is Decodo TypeScript SDK?
+
+Decodo TypeScript SDK is the official TypeScript SDK for the Decodo Web Scraping API. It provides a typed interface for interacting with Decodo targets like Google, Amazon, TikTok, Reddit, YouTube, ChatGPT, Perplexity, and more.
+
+Instead of manually constructing HTTP requests and validating payloads, you can work with fully typed methods and target-specific parameters directly in your editor.
+
+# Why use the SDK?
+
+- **Strong typing and autocomplete**. Target parameters are fully typed for better DX and fewer mistakes.
+- **Unified scraping interface**. Work with search engines, eCommerce platforms, social media, and AI tools through one SDK.
+- **Async and batch workflows**. Create scraping tasks, poll statuses, and process batches at scale.
+- **Typed errors**. Handle authentication, validation, timeout, and rate-limit failures safely.
+- **Minimal setup**. Uses native `fetch`, no additional HTTP client required.
 
 ## Requirements
 
@@ -22,6 +37,8 @@ npm install --save @decodo/sdk-ts
 
 ## Quick start
 
+Create a new project:
+
 ```sh
 mkdir scrape-with-decodo
 cd scrape-with-decodo
@@ -34,8 +51,8 @@ touch main.js
 
 <details>
 <summary>Optional: prevent module type warning</summary>
-
 Run the following script to switch to ESM modules:
+<br />
 
 ```sh
 node -e "let p=require('./package.json'); p.type='module'; require('fs').writeFileSync('./package.json', JSON.stringify(p, null, 2))"
@@ -43,9 +60,7 @@ node -e "let p=require('./package.json'); p.type='module'; require('fs').writeFi
 
 </details>
 
-<br />
-
-Obtain a basic auth token from the [Decodo dashboard](https://dashboard.decodo.com/welcome) and use it in the following sample:
+Get a Web Scraping API basic authentication token from the [Decodo dashboard](https://dashboard.decodo.com/welcome) and use it in the following example:
 
 ```typescript
 // main.js
@@ -66,7 +81,7 @@ const result = await client.webScrapingApi.scrape({
 console.log(JSON.stringify(result, null, 2));
 ```
 
-Then run the scraping task with:
+Run the script:
 
 ```
 node main.js
@@ -83,9 +98,14 @@ const client = new DecodoClient({
 });
 ```
 
+| Parameter | Description |
+| --- | --- |
+| `token` | Web Scraping API basic authentication token |
+| `timeoutMs` | Request timeout in milliseconds (default: 180000) |
+
 ## Web Scraping API
 
-Access via `client.webScrapingApi`.
+Access the API via `client.webScrapingApi`.
 
 The snippets below assume you have already imported `Target` (and `DecodoClient` where a client is constructed), for example:
 
@@ -95,7 +115,7 @@ import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 ### Sync scrape
 
-Blocks until the scraping result is ready:
+Waits for the scraping result before returning:
 
 ```typescript
 const result = await client.webScrapingApi.scrape({
@@ -107,7 +127,7 @@ const result = await client.webScrapingApi.scrape({
 
 ### Async scrape
 
-Creates a task and returns immediately. Poll separately for results:
+Creates a scraping task and returns immediately. Poll separately for task status and results:
 
 ```typescript
 const task = await client.webScrapingApi.scrapeAsync({
@@ -124,7 +144,7 @@ const results = await client.webScrapingApi.getResults(task.id);
 
 ### Batch scrape
 
-Send multiple URLs or queries in a single request:
+Send multiple queries or URLs in a single request:
 
 ```typescript
 const batch = await client.webScrapingApi.scrapeBatch({
@@ -138,64 +158,59 @@ const coffeeTaskId = batch.queries[0].id;
 await client.webScrapingApi.getResults(coffeeTaskId);
 ```
 
-## Available targets
+## Supported targets
 
-Each target accepts a single required input parameter (`url`, `query`, `product_id`, or `prompt`) plus optional configuration. The examples below show the minimum payload to call `client.webScrapingApi.scrape(...)`.
+Each target accepts one primary input parameter (`url`, `query`, `product_id`, or `prompt`) together with optional configuration. The examples below show the minimum payload to call `client.webScrapingApi.scrape(...)`.
+
+### Search engines
 
 | Target | Description | Example |
 | --- | --- | --- |
 | `Target.GoogleSearch` | Google Search results for a query. | `{ target: Target.GoogleSearch, query: "coffee shops" }` |
-| `Target.GoogleTravelHotels` | Google Travel hotel listings. | `{ target: Target.GoogleTravelHotels, query: "trivago" }` |
-| `Target.GoogleTrendsExplore` | Google Trends Explore data for a topic. | `{ target: Target.GoogleTrendsExplore, query: "seo optimization" }` |
-| `Target.GoogleShoppingSearch` | Google Shopping search results. | `{ target: Target.GoogleShoppingSearch, query: "laptop" }` |
-| `Target.GoogleShoppingProduct` | A single product page on Google Shopping. | `{ target: Target.GoogleShoppingProduct, query: "1234567890" }` |
-| `Target.Google` | A raw Google URL (search, news, images, etc.). | `{ target: Target.Google, url: "https://www.google.com/search?q=laptop" }` |
-| `Target.GoogleSuggest` | Google search autocomplete suggestions. | `{ target: Target.GoogleSuggest, query: "coffee" }` |
 | `Target.GoogleMaps` | Google Maps search results. | `{ target: Target.GoogleMaps, query: "coffee shops brooklyn" }` |
-| `Target.GoogleAiMode` | Google AI Mode response for a prompt. | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
-| `Target.GoogleAds` | Google Ads results for a query. | `{ target: Target.GoogleAds, query: "laptop" }` |
-| `Target.GoogleLens` | Google Lens reverse image search by image URL. | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
-| `Target.BingSearch` | Bing Search results for a query. | `{ target: Target.BingSearch, query: "electric vehicles" }` |
-| `Target.Bing` | A raw Bing URL. | `{ target: Target.Bing, url: "https://www.bing.com/search?q=laptop" }` |
-| `Target.YoutubeTranscript` | Transcript for a YouTube video ID. | `{ target: Target.YoutubeTranscript, query: "dFu9aKJoqGg" }` |
+| `Target.GoogleShoppingSearch` | Google Shopping search results. | `{ target: Target.GoogleShoppingSearch, query: "laptop" }` |
+| `Target.GoogleSuggest` | Google Autocomplete suggestions. | `{ target: Target.GoogleSuggest, query: "coffee" }` |
+| `Target.GoogleLens` | Google Lens reverse image search. | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
+| `Target.BingSearch` | Bing Search results. | `{ target: Target.BingSearch, query: "electric vehicles" }` |
+
+### eCommerce
+
+| Target | Description | Example |
+| --- | --- | --- |
 | `Target.AmazonProduct` | Amazon product detail page by ASIN. | `{ target: Target.AmazonProduct, query: "B09H74FXNW" }` |
-| `Target.AmazonPricing` | Amazon pricing/offers for an ASIN. | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }` |
-| `Target.AmazonSearch` | Amazon search results for a query. | `{ target: Target.AmazonSearch, query: "laptop" }` |
-| `Target.AmazonSellers` | Amazon seller profile by seller ID. | `{ target: Target.AmazonSellers, query: "A1R0Z7FJGTKESH" }` |
-| `Target.AmazonBestsellers` | Amazon bestsellers list for a category. | `{ target: Target.AmazonBestsellers, query: "mobile-apps" }` |
-| `Target.Amazon` | A raw Amazon URL. | `{ target: Target.Amazon, url: "https://www.amazon.com/dp/B09H74FXNW" }` |
-| `Target.Ecommerce` | Generic ecommerce page by URL with parser. | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
+| `Target.AmazonSearch` | Amazon search results. | `{ target: Target.AmazonSearch, query: "laptop" }` |
+| `Target.AmazonPricing` | Amazon pricing and offers. | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }` |
 | `Target.WalmartProduct` | Walmart product page by product ID. | `{ target: Target.WalmartProduct, product_id: "15296401808" }` |
-| `Target.WalmartSearch` | Walmart search results for a query. | `{ target: Target.WalmartSearch, query: "wireless earbuds" }` |
-| `Target.Walmart` | A raw Walmart URL. | `{ target: Target.Walmart, url: "https://www.walmart.com/cp/christmas-shop/1386088" }` |
 | `Target.TargetProduct` | Target.com product page by product ID. | `{ target: Target.TargetProduct, product_id: "92186007" }` |
-| `Target.TargetSearch` | Target.com search results for a query. | `{ target: Target.TargetSearch, query: "laptop" }` |
-| `Target.Target` | A raw Target.com URL. | `{ target: Target.Target, url: "https://www.target.com/p/-/A-92186007" }` |
-| `Target.LowesSearch` | Lowe's search results for a query. | `{ target: Target.LowesSearch, query: "drill" }` |
-| `Target.Universal` | Any URL via the universal scraper. | `{ target: Target.Universal, url: "https://www.example.com" }` |
+| `Target.Ecommerce` | Generic eCommerce page with parser. | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
+
+### Social media
+
+| Target | Description | Example |
+| --- | --- | --- |
+| `Target.RedditPost` | Reddit post by URL. | `{ target: Target.RedditPost, url: "https://reddit.com/r/nba/..." }` |
+| `Target.RedditSubreddit` | Reddit subreddit by URL. | `{ target: Target.RedditSubreddit, url: "https://reddit.com/r/nba/" }` |
+| `Target.YoutubeVideo` | YouTube video by ID. | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }` |
+| `Target.YoutubeSearch` | YouTube search results. | `{ target: Target.YoutubeSearch, query: "ambient music" }` |
+| `Target.TiktokPost` | TikTok post by URL. | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/..." }` |
+
+### AI tools
+
+| Target | Description | Example |
+| --- | --- | --- |
 | `Target.Chatgpt` | ChatGPT response for a prompt. | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }` |
 | `Target.Perplexity` | Perplexity response for a prompt. | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }` |
-| `Target.Bbb` | Better Business Bureau page by URL. | `{ target: Target.Bbb, url: "https://www.bbb.org/search?find_text=Tree+Service" }` |
-| `Target.Autotrader` | Autotrader listing or search page by URL. | `{ target: Target.Autotrader, url: "https://www.autotrader.co.uk/car-search?channel=cars" }` |
-| `Target.Mobile` | mobile.de listing or search page by URL. | `{ target: Target.Mobile, url: "https://suchen.mobile.de/fahrzeuge/search.html?s=Car" }` |
-| `Target.Airbnb` | Airbnb listing or search page by URL. | `{ target: Target.Airbnb, url: "https://www.airbnb.com/s/New-York-City--New-York/homes" }` |
-| `Target.AppleAppStore` | Apple App Store page by URL. | `{ target: Target.AppleAppStore, url: "https://apps.apple.com/us/iphone/games" }` |
-| `Target.InstagramGraphqlProfile` | Instagram profile by username. | `{ target: Target.InstagramGraphqlProfile, query: "nba" }` |
-| `Target.TiktokPost` | TikTok post by URL. | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/7255379108241198378" }` |
-| `Target.TiktokShopSearch` | TikTok Shop search results for a query. | `{ target: Target.TiktokShopSearch, query: "necklace" }` |
-| `Target.TiktokShopProduct` | TikTok Shop product by product ID. | `{ target: Target.TiktokShopProduct, product_id: "1731541214379741272" }` |
-| `Target.Tiktok` | A raw TikTok URL. | `{ target: Target.Tiktok, url: "https://www.tiktok.com/@nba/video/7255379108241198378" }` |
-| `Target.RedditPost` | Reddit post by URL. | `{ target: Target.RedditPost, url: "https://www.reddit.com/r/nba/comments/17jrqc5/" }` |
-| `Target.RedditSubreddit` | Reddit subreddit by URL. | `{ target: Target.RedditSubreddit, url: "https://www.reddit.com/r/nba/" }` |
-| `Target.RedditUser` | Reddit user profile by URL. | `{ target: Target.RedditUser, url: "https://www.reddit.com/user/IWasRightOnce/" }` |
-| `Target.YoutubeVideo` | YouTube video by video ID. | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }` |
-| `Target.YoutubeMetadata` | YouTube video metadata by video ID. | `{ target: Target.YoutubeMetadata, query: "dFu9aKJoqGg" }` |
-| `Target.YoutubeSearch` | YouTube search results for a query. | `{ target: Target.YoutubeSearch, query: "How to care for chinchillas" }` |
-| `Target.YoutubeSearchMax` | YouTube search results with extra filters. | `{ target: Target.YoutubeSearchMax, query: "How to care for chinchillas" }` |
-| `Target.YoutubeSubtitles` | YouTube subtitles by video ID. | `{ target: Target.YoutubeSubtitles, query: "L8zSWbQN-v8" }` |
-| `Target.YoutubeChannel` | YouTube channel by handle. | `{ target: Target.YoutubeChannel, query: "@decodo_official" }` |
+| `Target.GoogleAiMode` | Google AI Mode response. | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
 
-Note: `Target.UniversalEcommerce` is not listed above — it does not accept a `url`, `query`, `product_id`, or `prompt` parameter, only optional configuration like `callback_url`.
+### Universal scraping
+
+| Target | Description | Example |
+| --- | --- | --- |
+| `Target.Universal` | Any URL via the universal scraper. | `{ target: Target.Universal, url: "https://example.com" }` |
+| `Target.Google` | Raw Google URL scraping. | `{ target: Target.Google, url: "https://google.com/search?q=laptop" }` |
+| `Target.Amazon` | Raw Amazon URL scraping. | `{ target: Target.Amazon, url: "https://amazon.com/dp/B09H74FXNW" }` |
+
+> `Target.UniversalEcommerce` isn't listed above because it doesn't accept a primary input parameter like `url`, `query`, `product_id`, or `prompt`. It only accepts optional configuration fields such as `callback_url`.
 
 ## Error handling
 
@@ -230,3 +245,21 @@ try {
   }
 }
 ```
+
+## Related repositories
+
+- [Web Scraping API](https://github.com/Decodo/Web-Scraping-API)
+- [Decodo MCP Server](https://github.com/Decodo/mcp-server)
+- [Decodo OpenClaw Skill](https://github.com/Decodo/decodo-openclaw-skill)
+
+## Try it
+
+Start building scraping workflows with the Decodo Web Scraping API:
+
+- [Start for free](https://dashboard.decodo.com/)
+- [Documentation](https://help.decodo.com/docs/introduction)
+- [Discord](https://discord.gg/Ja8dqKgvbZ)
+
+## License
+
+Released under the [MIT License](https://github.com/Decodo/Decodo/blob/master/LICENSE).
