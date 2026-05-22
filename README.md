@@ -32,8 +32,8 @@ Instead of manually constructing HTTP requests and validating payloads, you can 
 
 ## Requirements
 
-- Node.js >= 18 (for native `fetch`)
-- TypeScript >= 5.0 (recommended for best type inference)
+- Node.js 18+ (for native `fetch`)
+- TypeScript 5.0+ (recommended for best type inference)
 
 ## Installation
 
