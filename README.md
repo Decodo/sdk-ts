@@ -172,51 +172,56 @@ Each target accepts one primary input parameter (`url`, `query`, `product_id`, o
 
 | Target | Description | Example |
 | --- | --- | --- |
-| `Target.GoogleSearch` | Google Search results for a query. | `{ target: Target.GoogleSearch, query: "coffee shops" }` |
-| `Target.GoogleMaps` | Google Maps search results. | `{ target: Target.GoogleMaps, query: "coffee shops brooklyn" }` |
-| `Target.GoogleShoppingSearch` | Google Shopping search results. | `{ target: Target.GoogleShoppingSearch, query: "laptop" }` |
-| `Target.GoogleSuggest` | Google Autocomplete suggestions. | `{ target: Target.GoogleSuggest, query: "coffee" }` |
-| `Target.GoogleLens` | Google Lens reverse image search. | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
-| `Target.BingSearch` | Bing Search results. | `{ target: Target.BingSearch, query: "electric vehicles" }` |
+| `Target.GoogleSearch` | Google Search results for a query | `{ target: Target.GoogleSearch, query: "coffee shops" }` |
+| `Target.GoogleMaps` | Google Maps search results | `{ target: Target.GoogleMaps, query: "coffee shops brooklyn" }` |
+| `Target.GoogleShoppingSearch` | Google Shopping search results | `{ target: Target.GoogleShoppingSearch, query: "laptop" }` |
+| `Target.GoogleSuggest` | Google Autocomplete suggestions | `{ target: Target.GoogleSuggest, query: "coffee" }` |
+| `Target.GoogleLens` | Google Lens reverse image search | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
+| `Target.BingSearch` | Bing Search results | `{ target: Target.BingSearch, query: "electric vehicles" }` |
 
 ### eCommerce
 
 | Target | Description | Example |
 | --- | --- | --- |
-| `Target.AmazonProduct` | Amazon product detail page by ASIN. | `{ target: Target.AmazonProduct, query: "B09H74FXNW" }` |
-| `Target.AmazonSearch` | Amazon search results. | `{ target: Target.AmazonSearch, query: "laptop" }` |
-| `Target.AmazonPricing` | Amazon pricing and offers. | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }` |
-| `Target.WalmartProduct` | Walmart product page by product ID. | `{ target: Target.WalmartProduct, product_id: "15296401808" }` |
-| `Target.TargetProduct` | Target.com product page by product ID. | `{ target: Target.TargetProduct, product_id: "92186007" }` |
-| `Target.Ecommerce` | Generic eCommerce page with parser. | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
+| `Target.AmazonProduct` | Amazon product detail page by ASIN | `{ target: Target.AmazonProduct, query: "B09H74FXNW" }` |
+| `Target.AmazonSearch` | Amazon search results | `{ target: Target.AmazonSearch, query: "laptop" }` |
+| `Target.AmazonPricing` | Amazon pricing and offers | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }` |
+| `Target.WalmartProduct` | Walmart product page by product ID | `{ target: Target.WalmartProduct, product_id: "15296401808" }` |
+| `Target.TargetProduct` | Target.com product page by product ID | `{ target: Target.TargetProduct, product_id: "92186007" }` |
+| `Target.Ecommerce` | Generic eCommerce page with parser | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
 
 ### Social media
 
 | Target | Description | Example |
 | --- | --- | --- |
-| `Target.RedditPost` | Reddit post by URL. | `{ target: Target.RedditPost, url: "https://reddit.com/r/nba/..." }` |
-| `Target.RedditSubreddit` | Reddit subreddit by URL. | `{ target: Target.RedditSubreddit, url: "https://reddit.com/r/nba/" }` |
-| `Target.YoutubeVideo` | YouTube video by ID. | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }` |
-| `Target.YoutubeSearch` | YouTube search results. | `{ target: Target.YoutubeSearch, query: "ambient music" }` |
-| `Target.TiktokPost` | TikTok post by URL. | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/..." }` |
+| `Target.RedditPost` | Reddit post by URL | `{ target: Target.RedditPost, url: "https://reddit.com/r/nba/..." }` |
+| `Target.RedditSubreddit` | Reddit subreddit by URL | `{ target: Target.RedditSubreddit, url: "https://reddit.com/r/nba/" }` |
+| `Target.YoutubeVideo` | YouTube video by ID | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }` |
+| `Target.YoutubeSearch` | YouTube search results | `{ target: Target.YoutubeSearch, query: "ambient music" }` |
+| `Target.TiktokPost` | TikTok post by URL | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/..." }` |
 
 ### AI tools
 
 | Target | Description | Example |
 | --- | --- | --- |
-| `Target.Chatgpt` | ChatGPT response for a prompt. | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }` |
-| `Target.Perplexity` | Perplexity response for a prompt. | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }` |
-| `Target.GoogleAiMode` | Google AI Mode response. | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
+| `Target.Chatgpt` | ChatGPT response for a prompt | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }` |
+| `Target.Perplexity` | Perplexity response for a prompt | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }` |
+| `Target.GoogleAiMode` | Google AI Mode response | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
 
 ### Universal scraping
 
 | Target | Description | Example |
 | --- | --- | --- |
-| `Target.Universal` | Any URL via the universal scraper. | `{ target: Target.Universal, url: "https://example.com" }` |
-| `Target.Google` | Raw Google URL scraping. | `{ target: Target.Google, url: "https://google.com/search?q=laptop" }` |
-| `Target.Amazon` | Raw Amazon URL scraping. | `{ target: Target.Amazon, url: "https://amazon.com/dp/B09H74FXNW" }` |
+| `Target.Universal` | Any URL via the universal scraper | `{ target: Target.Universal, url: "https://example.com" }` |
+| `Target.Google` | Raw Google URL scraping | `{ target: Target.Google, url: "https://google.com/search?q=laptop" }` |
+| `Target.Amazon` | Raw Amazon URL scraping | `{ target: Target.Amazon, url: "https://amazon.com/dp/B09H74FXNW" }` |
 
 > `Target.UniversalEcommerce` isn't listed above because it doesn't accept a primary input parameter like `url`, `query`, `product_id`, or `prompt`. It only accepts optional configuration fields such as `callback_url`.
+
+For the full target list and parameter details, see the API documentation:
+
+- [Target list](https://help.decodo.com/docs/web-scraping-api-targets)
+- [Parameters](https://help.decodo.com/docs/web-scraping-api-parameters)
 
 ## Error handling
 
