@@ -1,0 +1,7 @@
+export const DEFAULT_IR_BUCKET = 'decodo-sdk-config';
+export const DEFAULT_IR_PREFIX = 'decodo-ir-v';
+export const DEFAULT_IR_BASE =
+  'https://storage.googleapis.com/decodo-sdk-config';
+export const DEFAULT_IR_LIST_URL =
+  'https://storage.googleapis.com/storage/v1/b/decodo-sdk-config/o?prefix=decodo-ir-v';
+export const DEFAULT_IR_CACHE_PATH = '~/.decodo/decodo.ir.json';
