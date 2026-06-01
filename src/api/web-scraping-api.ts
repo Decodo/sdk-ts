@@ -1,7 +1,8 @@
 import { prettifyError } from 'zod';
 import { HttpClient } from '../http.js';
 import { ValidationError } from '../errors.js';
-import { requestSchemas } from '../generated/request-schemas.js';
+import { bundledSchemaProvider } from '../schema/bundled-provider.js';
+import type { SchemaProvider } from '../schema/types.js';
 import type { ScrapeRequest, BatchRequest } from '../generated/targets.js';
 import type {
   SyncResponse,
@@ -13,13 +14,15 @@ import type {
 
 export class WebScrapingApi {
   private readonly http: HttpClient;
+  private readonly schemas: SchemaProvider;
 
-  constructor(http: HttpClient) {
+  constructor(http: HttpClient, schemas: SchemaProvider = bundledSchemaProvider) {
     this.http = http;
+    this.schemas = schemas;
   }
 
   private validate(params: ScrapeRequest): void {
-    const schema = requestSchemas[params.target];
+    const schema = this.schemas.getRequestSchema(params.target);
     if (!schema) {
       return;
     }

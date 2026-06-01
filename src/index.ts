@@ -1,5 +1,5 @@
 export { DecodoClient } from './client.js';
-export type { DecodoConfig } from './client.js';
+export type { DecodoConfig, ValidationConfig } from './client.js';
 export { WebScrapingApi } from './api/web-scraping-api.js';
 
 export type {
