@@ -1,8 +1,8 @@
 import { prettifyError } from 'zod';
 import { HttpClient } from '../http.js';
 import { ValidationError } from '../errors.js';
-import { bundledSchemaProvider } from '../schema/bundled-provider.js';
-import type { SchemaProvider } from '../schema/types.js';
+import { BundledSchema } from '../schema/bundled-schema.js';
+import type { DecodoSchema } from '../schema/types.js';
 import type { ScrapeRequest, BatchRequest } from '../generated/targets.js';
 import type {
   SyncResponse,
@@ -14,9 +14,9 @@ import type {
 
 export class WebScrapingApi {
   private readonly http: HttpClient;
-  private readonly schemas: SchemaProvider;
+  private readonly schemas: DecodoSchema;
 
-  constructor(http: HttpClient, schemas: SchemaProvider = bundledSchemaProvider) {
+  constructor(http: HttpClient, schemas: DecodoSchema = BundledSchema.shared) {
     this.http = http;
     this.schemas = schemas;
   }

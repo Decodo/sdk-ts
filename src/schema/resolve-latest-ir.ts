@@ -3,15 +3,7 @@ import {
   DEFAULT_IR_LIST_URL,
   DEFAULT_IR_PREFIX,
 } from './constants.js';
-
-type GcsObjectList = {
-  items?: Array<{ name: string }>;
-};
-
-type LatestIrLocation = {
-  version: string;
-  url: string;
-};
+import type { GcsObjectList, LatestIrLocation } from './types.js';
 
 const IR_OBJECT_PATTERN = /^decodo-ir-v(.+)\.json$/;
 
