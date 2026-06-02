@@ -6,9 +6,11 @@ export default tseslint.config(
     ignores: [
       'build/**',
       'src/generated/**',
+      'src/**/test-helpers.ts',
       'lib/**',
       // Root JS config is not in tsconfig.json; projectService cannot load it.
       'eslint.config.js',
+      'vitest.config.ts',
     ],
   },
   eslint.configs.recommended,
