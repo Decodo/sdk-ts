@@ -11,6 +11,6 @@
     "outDir": "build",
     "rootDir": "src"
   },
-  "include": ["src/**/*", "examples/**/*"],
-  "exclude": ["build/**", "./*.js"]
+  "include": ["src/**/*"],
+  "exclude": ["build/**", "examples/**/*", "./*.js"]
 }
