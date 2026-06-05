@@ -30,7 +30,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "node -e \"if (!require('fs').existsSync('./build')) { console.error('❌ Error: The \\\"build/\\\" folder is missing. Run a build first!'); process.exit(1); }\""
   },
   "engines": {
     "node": ">=18.0.0"
