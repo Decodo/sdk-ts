@@ -5,6 +5,7 @@ export default tseslint.config(
   {
     ignores: [
       'build/**',
+      'examples/**',
       'src/generated/**',
       'src/**/test-helpers.ts',
       'lib/**',

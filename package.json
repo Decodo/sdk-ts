@@ -1,6 +1,6 @@
 {
   "name": "@decodo/sdk-ts",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Official TypeScript SDK for the Decodo APIs",
   "type": "module",
   "main": "./build/cjs/index.cjs",
@@ -31,7 +31,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "node -e \"if (!require('fs').existsSync('./build')) { console.error('❌ Error: The \\\"build/\\\" folder is missing. Run a build first!'); process.exit(1); }\""
+    "prepack": "pnpm run build:esm && pnpm run build:cjs"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -43,13 +43,14 @@
     "dts-bundle-generator": "^9.5.1",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.1",
+    "json-schema-to-typescript": "^15.0.4",
     "tsx": "^4.19.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.40.0",
     "vitest": "^4.1.7"
   },
   "dependencies": {
-    "json-schema-to-typescript": "^15.0.4",
     "zod": "^4"
-  }
+  },
+  "license": "MIT"
 }
