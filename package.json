@@ -1,6 +1,6 @@
 {
   "name": "@decodo/sdk-ts",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Official TypeScript SDK for the Decodo APIs",
   "type": "module",
   "main": "./build/cjs/index.cjs",
