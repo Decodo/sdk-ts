@@ -21,16 +21,19 @@ export type HttpClientConfig = {
   baseUrl: string;
   auth: BasicAuth | ApiKeyAuth;
   timeoutMs: number;
+  integrationHeader?: string;
 };
 
 export class HttpClient {
   private readonly baseUrl: string;
   private readonly authHeader: string;
   private readonly timeoutMs: number;
+  private readonly integrationHeader: string;
 
   constructor(config: HttpClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/+$/, '');
     this.timeoutMs = config.timeoutMs;
+    this.integrationHeader = config.integrationHeader ?? 'sdk-ts';
 
     if (config.auth.type === 'basic') {
       this.authHeader = `Basic ${config.auth.token}`;
@@ -51,7 +54,7 @@ export class HttpClient {
           Authorization: this.authHeader,
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          'x-integration': 'sdk-ts',
+          'x-integration': this.integrationHeader,
         },
         signal: controller.signal,
       };

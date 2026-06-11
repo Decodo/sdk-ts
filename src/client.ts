@@ -9,6 +9,7 @@ const DEFAULT_TIMEOUT_MS = 180_000;
 export type DecodoConfig = {
   webScrapingApi?: {
     token: string;
+    integrationHeader?: string;
   };
   timeoutMs?: number;
   schema?: DecodoSchema;
@@ -34,6 +35,7 @@ export class DecodoClient {
             token: config.webScrapingApi.token,
           },
           timeoutMs,
+          integrationHeader: config.webScrapingApi.integrationHeader,
         }),
         schema,
       );
