@@ -36,6 +36,7 @@ export enum Target {
   Universal = 'universal',
   Chatgpt = 'chatgpt',
   Perplexity = 'perplexity',
+  Gemini = 'gemini',
   Bbb = 'bbb',
   Autotrader = 'autotrader',
   Mobile = 'mobile',
@@ -60,7 +61,7 @@ export enum Target {
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
+export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
 
 export interface UniversalEcommerceParams {
   callback_url?: string;
@@ -482,6 +483,14 @@ export interface PerplexityParams {
   callback_url?: string;
 }
 
+export interface GeminiParams {
+  prompt?: string;
+  parse?: boolean;
+  geo?: string;
+  xhr?: boolean;
+  callback_url?: string;
+}
+
 export interface BbbParams {
   url?: string;
   headless?: 'html' | 'png';
@@ -691,6 +700,7 @@ export type TargetParamsMap = {
   [Target.Universal]: UniversalParams;
   [Target.Chatgpt]: ChatgptParams;
   [Target.Perplexity]: PerplexityParams;
+  [Target.Gemini]: GeminiParams;
   [Target.Bbb]: BbbParams;
   [Target.Autotrader]: AutotraderParams;
   [Target.Mobile]: MobileParams;
@@ -886,6 +896,11 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "AI Tools",
     response_format: "json",
     parameters: ["prompt", "parse", "geo", "device_type", "markdown", "xhr", "callback_url"],
+  },
+  [Target.Gemini]: {
+    group: "AI Tools",
+    response_format: "json",
+    parameters: ["prompt", "parse", "geo", "xhr", "callback_url"],
   },
   [Target.Bbb]: {
     group: "Business Reviews",
