@@ -1514,6 +1514,34 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
+  [Target.Gemini]: {
+    "type": "object",
+    "properties": {
+      "target": {
+        "const": "gemini"
+      },
+      "prompt": {
+        "type": "string",
+        "maxLength": 8192
+      },
+      "parse": {
+        "type": "boolean"
+      },
+      "geo": {
+        "type": "string"
+      },
+      "xhr": {
+        "type": "boolean"
+      },
+      "callback_url": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "target"
+    ],
+    "additionalProperties": false
+  },
   [Target.Bbb]: {
     "type": "object",
     "properties": {
@@ -2186,6 +2214,7 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.Universal]: z.fromJSONSchema(requestJsonSchemas[Target.Universal] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Chatgpt]: z.fromJSONSchema(requestJsonSchemas[Target.Chatgpt] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Perplexity]: z.fromJSONSchema(requestJsonSchemas[Target.Perplexity] as unknown as z.core.JSONSchema.JSONSchema),
+  [Target.Gemini]: z.fromJSONSchema(requestJsonSchemas[Target.Gemini] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Bbb]: z.fromJSONSchema(requestJsonSchemas[Target.Bbb] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Autotrader]: z.fromJSONSchema(requestJsonSchemas[Target.Autotrader] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Mobile]: z.fromJSONSchema(requestJsonSchemas[Target.Mobile] as unknown as z.core.JSONSchema.JSONSchema),

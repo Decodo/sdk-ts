@@ -466,6 +466,7 @@ Each target accepts one primary input parameter (`url`, `query`, `product_id`, o
 | --- | --- | --- |
 | `Target.Chatgpt` | ChatGPT response for a prompt | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }` |
 | `Target.Perplexity` | Perplexity response for a prompt | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }` |
+| `Target.Gemini` | Gemini response for a prompt | `{ target: Target.Gemini, prompt: "What are the top three dog breeds?" }` |
 | `Target.GoogleAiMode` | Google AI Mode response | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
 
 ### Universal scraping
