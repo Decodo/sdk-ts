@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { JSONSchema4 } from 'json-schema';
 import { IR } from '../types';
+import { resolveLatestIr } from '../../schema/resolve-latest-ir.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -68,10 +69,20 @@ export const stripTargetProperty = (schema: JSONSchema4): JSONSchema4 => {
 };
 
 export const fetchIntermediateRepresentation = async (): Promise<IR> => {
-  if (!existsSync(localIrPath)) {
-    throw new Error(
-      `IR file not found: ${localIrPath}. Add inputs/decodo.ir.json or update localIrPath.`,
-    );
+  try {
+    const { url } = await resolveLatestIr();
+    const res = await fetch(url);
+    if (!res.ok) { throw new Error(`HTTP ${res.status}`); }
+    const json = await res.text();
+    mkdirSync(dirname(localIrPath), { recursive: true });
+    writeFileSync(localIrPath, json, 'utf-8');
+    return JSON.parse(json) as IR;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (existsSync(localIrPath)) {
+      console.warn(`Warning: failed to fetch IR (${message}). Using cached local file.`);
+      return JSON.parse(readFileSync(localIrPath, 'utf-8')) as IR;
+    }
+    throw new Error(`Failed to fetch IR (${message}) and no local cache found at ${localIrPath}.`);
   }
-  return JSON.parse(readFileSync(localIrPath, 'utf-8')) as IR;
 };
