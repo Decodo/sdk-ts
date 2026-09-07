@@ -38,7 +38,7 @@ export class HttpClient {
     if (config.auth.type === 'basic') {
       this.authHeader = `Basic ${config.auth.token}`;
     } else {
-      this.authHeader = config.auth.apiKey;
+      this.authHeader = `Bearer ${config.auth.apiKey}`;
     }
   }
 

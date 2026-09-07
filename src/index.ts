@@ -1,6 +1,7 @@
 export { DecodoClient } from './client.js';
-export type { DecodoConfig } from './client.js';
+export type { DecodoConfig, WebScrapingApiConfig } from './client.js';
 export { WebScrapingApi } from './api/web-scraping-api.js';
+export type { WebScrapingApiRoutes } from './api/web-scraping-api.js';
 export { BundledSchema } from './schema/bundled-schema.js';
 export { RemoteSchema } from './schema/remote-schema.js';
 export type { DecodoSchema, RemoteSchemaLoadOptions } from './schema/types.js';
