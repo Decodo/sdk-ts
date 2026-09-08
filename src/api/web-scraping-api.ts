@@ -12,13 +12,34 @@ import type {
   TaskResultsResponse,
 } from '../types/responses.js';
 
+export type WebScrapingApiRoutes = {
+  scrape: string;
+  task: string;
+};
+
+export const SCRAPER_API_ROUTES: WebScrapingApiRoutes = {
+  scrape: '/v2/scrape',
+  task: '/v3/task',
+};
+
+export const DATA_API_ROUTES: WebScrapingApiRoutes = {
+  scrape: '/v1/scrape',
+  task: '/v1/task',
+};
+
 export class WebScrapingApi {
   private readonly http: HttpClient;
   private readonly schemas: DecodoSchema;
+  private readonly routes: WebScrapingApiRoutes;
 
-  constructor(http: HttpClient, schemas: DecodoSchema = BundledSchema.shared) {
+  constructor(
+    http: HttpClient,
+    schemas: DecodoSchema = BundledSchema.shared,
+    routes: WebScrapingApiRoutes = SCRAPER_API_ROUTES,
+  ) {
     this.http = http;
     this.schemas = schemas;
+    this.routes = routes;
   }
 
   private validate(params: ScrapeRequest): void {
@@ -34,25 +55,25 @@ export class WebScrapingApi {
 
   async scrape(params: ScrapeRequest): Promise<SyncResponse> {
     this.validate(params);
-    return this.http.post<SyncResponse>('/v2/scrape', params);
+    return this.http.post<SyncResponse>(this.routes.scrape, params);
   }
 
   async scrapeAsync(params: ScrapeRequest): Promise<AsyncTaskResponse> {
     this.validate(params);
-    return this.http.post<AsyncTaskResponse>('/v3/task', params);
+    return this.http.post<AsyncTaskResponse>(this.routes.task, params);
   }
 
   async scrapeBatch(params: BatchRequest): Promise<BatchResponse> {
-    return this.http.post<BatchResponse>('/v3/task/batch', params);
+    return this.http.post<BatchResponse>(`${this.routes.task}/batch`, params);
   }
 
   async getStatus(taskId: string): Promise<TaskMetadata> {
-    return this.http.get<TaskMetadata>(`/v3/task/${taskId}`);
+    return this.http.get<TaskMetadata>(`${this.routes.task}/${taskId}`);
   }
 
   async getResults(taskId: string): Promise<TaskResultsResponse | null> {
     const res = await this.http.get<TaskResultsResponse | undefined>(
-      `/v3/task/${taskId}/results`,
+      `${this.routes.task}/${taskId}/results`,
     );
     return res ?? null;
   }
