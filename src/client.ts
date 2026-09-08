@@ -46,6 +46,10 @@ const resolveTransport = (config: WebScrapingApiConfig): Transport => {
   }
 
   if (apiKey !== undefined) {
+    if (!apiKey.trim()) {
+      throw new Error('webScrapingApi apiKey must be a non-empty string.');
+    }
+
     return {
       baseUrl: DATA_API_BASE_URL,
       auth: { type: 'apiKey', apiKey },
@@ -54,6 +58,10 @@ const resolveTransport = (config: WebScrapingApiConfig): Transport => {
   }
 
   if (token !== undefined) {
+    if (!token.trim()) {
+      throw new Error('webScrapingApi token must be a non-empty string.');
+    }
+
     return {
       baseUrl: WEB_API_BASE_URL,
       auth: { type: 'basic', token },

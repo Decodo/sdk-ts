@@ -66,4 +66,28 @@ describe('DecodoClient transport selection', () => {
       () => new DecodoClient({ webScrapingApi: {} }),
     ).toThrow(/webScrapingApi requires/);
   });
+
+  it('throws when token is an empty string', () => {
+    expect(
+      () => new DecodoClient({ webScrapingApi: { token: '' } }),
+    ).toThrow(/token must be a non-empty string/);
+  });
+
+  it('throws when apiKey is an empty string', () => {
+    expect(
+      () => new DecodoClient({ webScrapingApi: { apiKey: '' } }),
+    ).toThrow(/apiKey must be a non-empty string/);
+  });
+
+  it('throws when token is only whitespace', () => {
+    expect(
+      () => new DecodoClient({ webScrapingApi: { token: '   ' } }),
+    ).toThrow(/token must be a non-empty string/);
+  });
+
+  it('throws when apiKey is only whitespace', () => {
+    expect(
+      () => new DecodoClient({ webScrapingApi: { apiKey: '   ' } }),
+    ).toThrow(/apiKey must be a non-empty string/);
+  });
 });
