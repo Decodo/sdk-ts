@@ -18,9 +18,15 @@ export class AuthenticationError extends DecodoError {
 }
 
 export class RateLimitError extends DecodoError {
-  constructor(message = 'Rate limit exceeded. Slow down your request rate.') {
+  public readonly retryAfterMs: number | undefined;
+
+  constructor(
+    message = 'Rate limit exceeded. Slow down your request rate.',
+    retryAfterMs?: number,
+  ) {
     super(message, 429, 'failed');
     this.name = 'RateLimitError';
+    this.retryAfterMs = retryAfterMs;
   }
 }
 

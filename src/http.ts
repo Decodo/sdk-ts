@@ -24,6 +24,24 @@ export type HttpClientConfig = {
   integrationHeader?: string;
 };
 
+const parseRetryAfter = (value: string | null): number | undefined => {
+  if (!value) {
+    return undefined;
+  }
+
+  const seconds = Number(value);
+  if (Number.isFinite(seconds)) {
+    return Math.max(0, seconds * 1000);
+  }
+
+  const date = Date.parse(value);
+  if (!Number.isNaN(date)) {
+    return Math.max(0, date - Date.now());
+  }
+
+  return undefined;
+};
+
 export class HttpClient {
   private readonly baseUrl: string;
   private readonly authHeader: string;
@@ -85,7 +103,10 @@ export class HttpClient {
         throw new AuthenticationError(message);
       }
       if (res.status === 429) {
-        throw new RateLimitError(message);
+        throw new RateLimitError(
+          message,
+          parseRetryAfter(res.headers.get('retry-after')),
+        );
       }
       if (res.status === 422 || (res.status === 400 && errorBody?.errors)) {
         throw new ValidationError(message, errorBody?.errors);
