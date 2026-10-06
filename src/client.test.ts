@@ -50,6 +50,48 @@ describe('DecodoClient transport selection', () => {
     ]);
   });
 
+  it('sends token requests to a custom baseUrl with the scraper-api routes', async () => {
+    const urls: string[] = [];
+
+    mockFetch((input) => {
+      urls.push(String(input));
+      return jsonResponse({ results: [] });
+    });
+
+    const client = new DecodoClient({
+      webScrapingApi: { token: 'test-token', baseUrl: 'https://stage-scraper-api.example/' },
+    });
+    await client.webScrapingApi.scrape(scrapeParams);
+    await client.webScrapingApi.getStatus('task-1');
+
+    expect(urls).toEqual([
+      'https://stage-scraper-api.example/v2/scrape',
+      'https://stage-scraper-api.example/v3/task/task-1',
+    ]);
+  });
+
+  it('sends apiKey requests to a custom baseUrl with the data API routes', async () => {
+    const urls: string[] = [];
+
+    mockFetch((input) => {
+      urls.push(String(input));
+      return jsonResponse({ results: [] });
+    });
+
+    const client = new DecodoClient({
+      webScrapingApi: { apiKey: 'test-key', baseUrl: 'https://stage-data.example' },
+    });
+    await client.webScrapingApi.scrape(scrapeParams);
+
+    expect(urls).toEqual(['https://stage-data.example/v1/scrape']);
+  });
+
+  it('throws when baseUrl is not a URL', () => {
+    expect(
+      () => new DecodoClient({ webScrapingApi: { apiKey: 'test-key', baseUrl: 'stage-data' } }),
+    ).toThrow(/baseUrl must be a valid URL/);
+  });
+
   it('throws when both token and apiKey are provided', () => {
     expect(
       () =>

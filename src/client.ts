@@ -18,6 +18,7 @@ type WebScrapingApiCredentials =
 
 export type WebScrapingApiConfig = WebScrapingApiCredentials & {
   integrationHeader?: string;
+  baseUrl?: string;
 };
 
 export type DecodoConfig = {
@@ -36,8 +37,22 @@ type Transport = {
   routes: WebScrapingApiRoutes;
 };
 
+const resolveBaseUrl = (baseUrl: string | undefined, fallback: string): string => {
+  if (baseUrl === undefined) {
+    return fallback;
+  }
+
+  try {
+    new URL(baseUrl);
+  } catch {
+    throw new Error('webScrapingApi baseUrl must be a valid URL.');
+  }
+
+  return baseUrl;
+};
+
 const resolveTransport = (config: WebScrapingApiConfig): Transport => {
-  const { token, apiKey } = config;
+  const { token, apiKey, baseUrl } = config;
 
   if (token !== undefined && apiKey !== undefined) {
     throw new Error(
@@ -51,7 +66,7 @@ const resolveTransport = (config: WebScrapingApiConfig): Transport => {
     }
 
     return {
-      baseUrl: DATA_API_BASE_URL,
+      baseUrl: resolveBaseUrl(baseUrl, DATA_API_BASE_URL),
       auth: { type: 'apiKey', apiKey },
       routes: DATA_API_ROUTES,
     };
@@ -63,7 +78,7 @@ const resolveTransport = (config: WebScrapingApiConfig): Transport => {
     }
 
     return {
-      baseUrl: WEB_API_BASE_URL,
+      baseUrl: resolveBaseUrl(baseUrl, WEB_API_BASE_URL),
       auth: { type: 'basic', token },
       routes: SCRAPER_API_ROUTES,
     };
