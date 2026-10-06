@@ -84,7 +84,7 @@ const resolveTransport = (config: WebScrapingApiConfig): Transport => {
     };
   }
 
-  throw new Error('webScrapingApi requires token in DecodoConfig.');
+  throw new Error('webScrapingApi requires apiKey or token in DecodoConfig.');
 };
 
 export class DecodoClient {
@@ -112,7 +112,7 @@ export class DecodoClient {
         get() {
           notConfigured(
             'webScrapingApi',
-            'Provide webScrapingApi.token in DecodoConfig.',
+            'Provide webScrapingApi.apiKey or webScrapingApi.token in DecodoConfig.',
           );
         },
       });

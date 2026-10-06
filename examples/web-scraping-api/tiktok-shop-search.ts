@@ -2,7 +2,7 @@ import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
-    token: '<web_auth_token>',
+    apiKey: '<api_key>',
   },
 });
 
