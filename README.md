@@ -68,7 +68,7 @@ node -e "let p=require('./package.json'); p.type='module'; require('fs').writeFi
 
 </details>
 
-Get a Web Scraping API basic authentication token from the [Decodo dashboard](https://dashboard.decodo.com/welcome) and use it in the following example:
+Copy your Web Data API key from your Web Data API subscription on the [Decodo dashboard](https://dashboard.decodo.com/web-data/playground) and use it in the following example. Older plans only have a basic authentication token, which you can pass as `token` instead (see [Configuration](#configuration)).
 
 ```typescript
 // main.js
@@ -76,7 +76,7 @@ import { DecodoClient, Target } from '@decodo/sdk-ts';
 
 const client = new DecodoClient({
   webScrapingApi: {
-    token: '<basic_auth_token>',
+    apiKey: '<api_key>',
   },
 });
 
@@ -358,16 +358,28 @@ node main.js
 ```typescript
 const client = new DecodoClient({
   webScrapingApi: {
-    token: '<basic_auth_token>',
+    apiKey: '<api_key>',
   },
   timeoutMs: 120_000, // optional, request timeout in ms (default: 180s)
 });
 ```
 
-| Parameter | Description |
-| --- | --- |
-| `token` | Web Scraping API basic authentication token |
-| `timeoutMs` | Request timeout in milliseconds (default: 180000) |
+Pass either `apiKey` or `token`, not both. The client throws if you set both.
+
+```typescript
+// Basic authentication token (older plans)
+const client = new DecodoClient({
+  webScrapingApi: {
+    token: '<basic_auth_token>',
+  },
+});
+```
+
+| Parameter   | Description                                                                              |
+| ----------- | ---------------------------------------------------------------------------------------- |
+| `apiKey`    | Web Data API key. Recommended                                                            |
+| `token`     | Web Scraping API basic authentication token, for older plans. Use it instead of `apiKey` |
+| `timeoutMs` | Request timeout in milliseconds (default: 180000)                                        |
 
 ## Web Scraping API
 
@@ -430,52 +442,52 @@ Each target accepts one primary input parameter (`url`, `query`, `product_id`, o
 
 ### Search engines
 
-| Target | Description | Example |
-| --- | --- | --- |
-| `Target.GoogleSearch` | Google Search results for a query | `{ target: Target.GoogleSearch, query: "coffee shops" }` |
-| `Target.GoogleMaps` | Google Maps search results | `{ target: Target.GoogleMaps, query: "coffee shops brooklyn" }` |
-| `Target.GoogleShoppingSearch` | Google Shopping search results | `{ target: Target.GoogleShoppingSearch, query: "laptop" }` |
-| `Target.GoogleSuggest` | Google Autocomplete suggestions | `{ target: Target.GoogleSuggest, query: "coffee" }` |
-| `Target.GoogleLens` | Google Lens reverse image search | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
-| `Target.BingSearch` | Bing Search results | `{ target: Target.BingSearch, query: "electric vehicles" }` |
+| Target                        | Description                       | Example                                                               |
+| ----------------------------- | --------------------------------- | --------------------------------------------------------------------- |
+| `Target.GoogleSearch`         | Google Search results for a query | `{ target: Target.GoogleSearch, query: "coffee shops" }`              |
+| `Target.GoogleMaps`           | Google Maps search results        | `{ target: Target.GoogleMaps, query: "coffee shops brooklyn" }`       |
+| `Target.GoogleShoppingSearch` | Google Shopping search results    | `{ target: Target.GoogleShoppingSearch, query: "laptop" }`            |
+| `Target.GoogleSuggest`        | Google Autocomplete suggestions   | `{ target: Target.GoogleSuggest, query: "coffee" }`                   |
+| `Target.GoogleLens`           | Google Lens reverse image search  | `{ target: Target.GoogleLens, query: "https://example.com/cat.jpg" }` |
+| `Target.BingSearch`           | Bing Search results               | `{ target: Target.BingSearch, query: "electric vehicles" }`           |
 
 ### eCommerce
 
-| Target | Description | Example |
-| --- | --- | --- |
-| `Target.AmazonProduct` | Amazon product detail page by ASIN | `{ target: Target.AmazonProduct, query: "B09H74FXNW" }` |
-| `Target.AmazonSearch` | Amazon search results | `{ target: Target.AmazonSearch, query: "laptop" }` |
-| `Target.AmazonPricing` | Amazon pricing and offers | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }` |
-| `Target.WalmartProduct` | Walmart product page by product ID | `{ target: Target.WalmartProduct, product_id: "15296401808" }` |
-| `Target.TargetProduct` | Target.com product page by product ID | `{ target: Target.TargetProduct, product_id: "92186007" }` |
-| `Target.Ecommerce` | Generic eCommerce page with parser | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
+| Target                  | Description                           | Example                                                                |
+| ----------------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| `Target.AmazonProduct`  | Amazon product detail page by ASIN    | `{ target: Target.AmazonProduct, query: "B09H74FXNW" }`                |
+| `Target.AmazonSearch`   | Amazon search results                 | `{ target: Target.AmazonSearch, query: "laptop" }`                     |
+| `Target.AmazonPricing`  | Amazon pricing and offers             | `{ target: Target.AmazonPricing, query: "B09H74FXNW" }`                |
+| `Target.WalmartProduct` | Walmart product page by product ID    | `{ target: Target.WalmartProduct, product_id: "15296401808" }`         |
+| `Target.TargetProduct`  | Target.com product page by product ID | `{ target: Target.TargetProduct, product_id: "92186007" }`             |
+| `Target.Ecommerce`      | Generic eCommerce page with parser    | `{ target: Target.Ecommerce, url: "https://example.com/product/123" }` |
 
 ### Social media
 
-| Target | Description | Example |
-| --- | --- | --- |
-| `Target.RedditPost` | Reddit post by URL | `{ target: Target.RedditPost, url: "https://reddit.com/r/nba/..." }` |
-| `Target.RedditSubreddit` | Reddit subreddit by URL | `{ target: Target.RedditSubreddit, url: "https://reddit.com/r/nba/" }` |
-| `Target.YoutubeVideo` | YouTube video by ID | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }` |
-| `Target.YoutubeSearch` | YouTube search results | `{ target: Target.YoutubeSearch, query: "ambient music" }` |
-| `Target.TiktokPost` | TikTok post by URL | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/..." }` |
+| Target                   | Description             | Example                                                                       |
+| ------------------------ | ----------------------- | ----------------------------------------------------------------------------- |
+| `Target.RedditPost`      | Reddit post by URL      | `{ target: Target.RedditPost, url: "https://reddit.com/r/nba/..." }`          |
+| `Target.RedditSubreddit` | Reddit subreddit by URL | `{ target: Target.RedditSubreddit, url: "https://reddit.com/r/nba/" }`        |
+| `Target.YoutubeVideo`    | YouTube video by ID     | `{ target: Target.YoutubeVideo, query: "dFu9aKJoqGg" }`                       |
+| `Target.YoutubeSearch`   | YouTube search results  | `{ target: Target.YoutubeSearch, query: "ambient music" }`                    |
+| `Target.TiktokPost`      | TikTok post by URL      | `{ target: Target.TiktokPost, url: "https://www.tiktok.com/@nba/video/..." }` |
 
 ### AI tools
 
-| Target | Description | Example |
-| --- | --- | --- |
-| `Target.Chatgpt` | ChatGPT response for a prompt | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }` |
-| `Target.Perplexity` | Perplexity response for a prompt | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }` |
-| `Target.Gemini` | Gemini response for a prompt | `{ target: Target.Gemini, prompt: "What are the top three dog breeds?" }` |
-| `Target.GoogleAiMode` | Google AI Mode response | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
+| Target                | Description                      | Example                                                                        |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
+| `Target.Chatgpt`      | ChatGPT response for a prompt    | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }`     |
+| `Target.Perplexity`   | Perplexity response for a prompt | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }`     |
+| `Target.Gemini`       | Gemini response for a prompt     | `{ target: Target.Gemini, prompt: "What are the top three dog breeds?" }`      |
+| `Target.GoogleAiMode` | Google AI Mode response          | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
 
 ### Universal scraping
 
-| Target | Description | Example |
-| --- | --- | --- |
-| `Target.Universal` | Any URL via the universal scraper | `{ target: Target.Universal, url: "https://example.com" }` |
-| `Target.Google` | Raw Google URL scraping | `{ target: Target.Google, url: "https://google.com/search?q=laptop" }` |
-| `Target.Amazon` | Raw Amazon URL scraping | `{ target: Target.Amazon, url: "https://amazon.com/dp/B09H74FXNW" }` |
+| Target             | Description                       | Example                                                                |
+| ------------------ | --------------------------------- | ---------------------------------------------------------------------- |
+| `Target.Universal` | Any URL via the universal scraper | `{ target: Target.Universal, url: "https://example.com" }`             |
+| `Target.Google`    | Raw Google URL scraping           | `{ target: Target.Google, url: "https://google.com/search?q=laptop" }` |
+| `Target.Amazon`    | Raw Amazon URL scraping           | `{ target: Target.Amazon, url: "https://amazon.com/dp/B09H74FXNW" }`   |
 
 > `Target.UniversalEcommerce` isn't listed above because it doesn't accept a primary input parameter like `url`, `query`, `product_id`, or `prompt`. It only accepts optional configuration fields such as `callback_url`.
 
