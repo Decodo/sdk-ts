@@ -29,7 +29,21 @@ export type {
   TaskResultsResponse,
   TaskStatus,
   ResultEntry,
+  CrawlPage,
+  CrawlResult,
 } from './types/responses.js';
+export type { CrawlOptions, CrawlResultsOptions } from './types/requests.js';
+export type {
+  RunSearchRequest,
+  RunSearchResponse,
+  MapSiteRequest,
+  MapSiteResponse,
+  StartCrawlRequest,
+  StartCrawlResponse,
+  GetCrawlStatusResponse,
+  ListCrawlPagesResponse,
+  CancelCrawlResponse,
+} from './generated/data-api.js';
 
 export {
   DecodoError,

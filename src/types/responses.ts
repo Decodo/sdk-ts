@@ -1,3 +1,8 @@
+import type {
+  GetCrawlStatusResponse,
+  ListCrawlPagesResponse,
+} from '../generated/data-api.js';
+
 export type ResultEntry = {
   content: unknown;
   status_code: number;
@@ -64,4 +69,11 @@ export type ErrorResponse = {
   status: string;
   message: string;
   errors?: unknown[];
+};
+
+export type CrawlPage = ListCrawlPagesResponse['url'][number];
+
+export type CrawlResult = {
+  status: GetCrawlStatusResponse;
+  pages: CrawlPage[];
 };
