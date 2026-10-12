@@ -436,6 +436,54 @@ const coffeeTaskId = batch.queries[0].id;
 await client.webScrapingApi.getResults(coffeeTaskId);
 ```
 
+### Search
+
+Runs a web search and returns the results page. Requires `apiKey`:
+
+```typescript
+const serp = await client.webScrapingApi.search({
+  query: 'laptop reviews',
+  geo: 'United States',
+});
+```
+
+### Map
+
+Discovers the links on a site. Requires `apiKey`:
+
+```typescript
+const map = await client.webScrapingApi.map({
+  url: 'https://example.com',
+  limit: 100,
+});
+
+const links = map.results[0].content.links;
+```
+
+### Crawl
+
+Starts a crawl, polls its status and returns every page once it settles. Requires `apiKey`:
+
+```typescript
+const { status, pages } = await client.webScrapingApi.crawl(
+  { url: 'https://example.com', limit: 50, output: 'markdown' },
+  { pollInterval: 5_000, timeout: 600_000 },
+);
+```
+
+To drive a crawl step by step, start it and poll separately for status and pages:
+
+```typescript
+const job = await client.webScrapingApi.startCrawl({ url: 'https://example.com' });
+
+const progress = await client.webScrapingApi.getCrawlStatus(job.crawl_id);
+console.log(progress.status); // 'pending' | 'done' | 'faulted' | 'cancelled' | 'truncated'
+
+const pages = await client.webScrapingApi.getCrawlResults(job.crawl_id);
+
+await client.webScrapingApi.cancelCrawl(job.crawl_id);
+```
+
 ## Supported targets
 
 Each target accepts one primary input parameter (`url`, `query`, `product_id`, or `prompt`) together with optional configuration. The examples below show the minimum payload to call `client.webScrapingApi.scrape(...)`.
