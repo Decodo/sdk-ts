@@ -213,6 +213,37 @@ describe('WebScrapingApi data API', () => {
     ]);
   });
 
+  it('returns one page of crawl results with the next cursor', async () => {
+    const requests = recordRequests(() => ({
+      crawl_id: 'crawl-1',
+      url: [crawlPage('https://example.com/b')],
+      next: 'https://data.decodo.com/v1/crawl/crawl-1?type=content&cursor=def',
+    }));
+    const api = createDataApi();
+
+    const page = await api.listCrawlPages('crawl-1', { cursor: 'abc' });
+
+    expect(page.pages.map(({ url }) => url)).toEqual(['https://example.com/b']);
+    expect(page.next).toBe('def');
+    expect(requests.map(({ url }) => url)).toEqual([
+      'https://data.decodo.com/v1/crawl/crawl-1?type=content&cursor=abc',
+    ]);
+  });
+
+  it('omits next and keeps total on the last crawl results page', async () => {
+    recordRequests(() => ({
+      crawl_id: 'crawl-1',
+      url: [crawlPage('https://example.com/a')],
+      total: 1,
+    }));
+    const api = createDataApi();
+
+    const page = await api.listCrawlPages('crawl-1');
+
+    expect(page.next).toBeUndefined();
+    expect(page.total).toBe(1);
+  });
+
   it('requests crawl results without content when asked', async () => {
     const requests = recordRequests(() => ({ crawl_id: 'crawl-1', url: [] }));
     const api = createDataApi();

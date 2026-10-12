@@ -73,6 +73,12 @@ export type ErrorResponse = {
 
 export type CrawlPage = ListCrawlPagesResponse['url'][number];
 
+export type CrawlPageList = {
+  pages: CrawlPage[];
+  next?: string;
+  total?: number;
+};
+
 export type CrawlResult = {
   status: GetCrawlStatusResponse;
   pages: CrawlPage[];

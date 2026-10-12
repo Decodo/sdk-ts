@@ -481,6 +481,12 @@ console.log(progress.status); // 'pending' | 'done' | 'faulted' | 'cancelled' | 
 
 const pages = await client.webScrapingApi.getCrawlResults(job.crawl_id);
 
+const firstPage = await client.webScrapingApi.listCrawlPages(job.crawl_id);
+
+if (firstPage.next) {
+  await client.webScrapingApi.listCrawlPages(job.crawl_id, { cursor: firstPage.next });
+}
+
 await client.webScrapingApi.cancelCrawl(job.crawl_id);
 ```
 

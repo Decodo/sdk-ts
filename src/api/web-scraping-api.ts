@@ -17,9 +17,14 @@ import type {
   StartCrawlResponse,
 } from '../generated/data-api.js';
 import type { ScrapeRequest, BatchRequest } from '../generated/targets.js';
-import type { CrawlOptions, CrawlResultsOptions } from '../types/requests.js';
+import type {
+  CrawlOptions,
+  CrawlPagesOptions,
+  CrawlResultsOptions,
+} from '../types/requests.js';
 import type {
   CrawlPage,
+  CrawlPageList,
   CrawlResult,
   SyncResponse,
   AsyncTaskResponse,
@@ -149,24 +154,46 @@ export class WebScrapingApi {
     );
   }
 
+  async listCrawlPages(
+    crawlId: string,
+    { cursor, content = true }: CrawlPagesOptions = {},
+  ): Promise<CrawlPageList> {
+    const query: Record<string, string> = {};
+    if (content) {
+      query.type = 'content';
+    }
+    if (cursor) {
+      query.cursor = cursor;
+    }
+
+    const res = await this.http.get<ListCrawlPagesResponse>(
+      this.crawlPath('listCrawlPages', crawlId, 'listCrawlPages'),
+      query,
+    );
+
+    return {
+      pages: res.url,
+      next: res.next
+        ? (new URL(res.next).searchParams.get('cursor') ?? undefined)
+        : undefined,
+      total: res.total,
+    };
+  }
+
   async getCrawlResults(
     crawlId: string,
     { content = true }: CrawlResultsOptions = {},
   ): Promise<CrawlPage[]> {
-    const path = this.crawlPath('listCrawlPages', crawlId, 'getCrawlResults');
     const pages: CrawlPage[] = [];
-    let query = content ? '?type=content' : '';
+    let cursor: string | undefined;
 
-    for (;;) {
-      const page = await this.http.get<ListCrawlPagesResponse>(
-        `${path}${query}`,
-      );
-      pages.push(...page.url);
-      if (!page.next) {
-        return pages;
-      }
-      query = new URL(page.next).search;
-    }
+    do {
+      const page = await this.listCrawlPages(crawlId, { cursor, content });
+      pages.push(...page.pages);
+      cursor = page.next;
+    } while (cursor);
+
+    return pages;
   }
 
   async cancelCrawl(crawlId: string): Promise<CancelCrawlResponse> {

@@ -8,3 +8,7 @@ export type CrawlOptions = {
 export type CrawlResultsOptions = {
   content?: boolean;
 };
+
+export type CrawlPagesOptions = CrawlResultsOptions & {
+  cursor?: string;
+};
