@@ -66,8 +66,9 @@ export type TaskResultsResponse = {
 };
 
 export type ErrorResponse = {
-  status: string;
-  message: string;
+  status?: string;
+  message?: string;
+  error?: string;
   errors?: unknown[];
 };
 

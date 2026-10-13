@@ -79,7 +79,8 @@ export class HttpClient {
         // response body wasn't JSON
       }
 
-      const message = errorBody?.message ?? `HTTP ${res.status}`;
+      const message =
+        errorBody?.message ?? errorBody?.error ?? `HTTP ${res.status}`;
 
       if (res.status === 401 || res.status === 403) {
         throw new AuthenticationError(message);
