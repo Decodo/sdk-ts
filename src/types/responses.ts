@@ -66,12 +66,19 @@ export type TaskResultsResponse = {
 };
 
 export type ErrorResponse = {
-  status: string;
-  message: string;
+  status?: string;
+  message?: string;
+  error?: string;
   errors?: unknown[];
 };
 
 export type CrawlPage = ListCrawlPagesResponse['url'][number];
+
+export type CrawlPageList = {
+  pages: CrawlPage[];
+  next?: string;
+  total?: number;
+};
 
 export type CrawlResult = {
   status: GetCrawlStatusResponse;

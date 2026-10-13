@@ -185,6 +185,12 @@ describe('WebScrapingApi data API', () => {
     await expect(api.crawl({ url: 'https://example.com' })).rejects.toThrow(
       'startCrawl() requires webScrapingApi.apiKey',
     );
+    await expect(api.getCrawlResults('crawl-1')).rejects.toThrow(
+      'getCrawlResults() requires webScrapingApi.apiKey',
+    );
+    await expect(api.listCrawlPages('crawl-1')).rejects.toThrow(
+      'listCrawlPages() requires webScrapingApi.apiKey',
+    );
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -211,6 +217,68 @@ describe('WebScrapingApi data API', () => {
       'https://data.decodo.com/v1/crawl/crawl-1?type=content',
       'https://data.decodo.com/v1/crawl/crawl-1?type=content&cursor=abc',
     ]);
+  });
+
+  it('returns one page of crawl results with the next cursor', async () => {
+    const requests = recordRequests(() => ({
+      crawl_id: 'crawl-1',
+      url: [crawlPage('https://example.com/b')],
+      next: 'https://data.decodo.com/v1/crawl/crawl-1?type=content&cursor=def',
+    }));
+    const api = createDataApi();
+
+    const page = await api.listCrawlPages('crawl-1', { cursor: 'abc' });
+
+    expect(page.pages.map(({ url }) => url)).toEqual(['https://example.com/b']);
+    expect(page.next).toBe('def');
+    expect(requests.map(({ url }) => url)).toEqual([
+      'https://data.decodo.com/v1/crawl/crawl-1?type=content&cursor=abc',
+    ]);
+  });
+
+  it('omits next and keeps total on the last crawl results page', async () => {
+    recordRequests(() => ({
+      crawl_id: 'crawl-1',
+      url: [crawlPage('https://example.com/a')],
+      total: 1,
+    }));
+    const api = createDataApi();
+
+    const page = await api.listCrawlPages('crawl-1');
+
+    expect(page.next).toBeUndefined();
+    expect(page.total).toBe(1);
+  });
+
+  it('throws instead of truncating when a next link has no cursor', async () => {
+    recordRequests(() => ({
+      crawl_id: 'crawl-1',
+      url: [crawlPage('https://example.com/a')],
+      next: 'https://data.decodo.com/v1/crawl/crawl-1?type=content&page=2',
+    }));
+    const api = createDataApi();
+
+    await expect(api.listCrawlPages('crawl-1')).rejects.toThrow(
+      'Crawl results next link has no cursor',
+    );
+  });
+
+  it('follows next links without a cursor in getCrawlResults', async () => {
+    const requests = recordRequests(({ url }) =>
+      url.includes('page=2')
+        ? { crawl_id: 'crawl-1', url: [crawlPage('https://example.com/b')] }
+        : {
+            crawl_id: 'crawl-1',
+            url: [crawlPage('https://example.com/a')],
+            next: 'https://data.decodo.com/v1/crawl/crawl-1?type=content&page=2',
+          },
+    );
+    const api = createDataApi();
+
+    const pages = await api.getCrawlResults('crawl-1');
+
+    expect(pages).toHaveLength(2);
+    expect(requests).toHaveLength(2);
   });
 
   it('requests crawl results without content when asked', async () => {

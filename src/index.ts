@@ -30,9 +30,14 @@ export type {
   TaskStatus,
   ResultEntry,
   CrawlPage,
+  CrawlPageList,
   CrawlResult,
 } from './types/responses.js';
-export type { CrawlOptions, CrawlResultsOptions } from './types/requests.js';
+export type {
+  CrawlOptions,
+  CrawlPagesOptions,
+  CrawlResultsOptions,
+} from './types/requests.js';
 export type {
   RunSearchRequest,
   RunSearchResponse,

@@ -17,9 +17,14 @@ import type {
   StartCrawlResponse,
 } from '../generated/data-api.js';
 import type { ScrapeRequest, BatchRequest } from '../generated/targets.js';
-import type { CrawlOptions, CrawlResultsOptions } from '../types/requests.js';
+import type {
+  CrawlOptions,
+  CrawlPagesOptions,
+  CrawlResultsOptions,
+} from '../types/requests.js';
 import type {
   CrawlPage,
+  CrawlPageList,
   CrawlResult,
   SyncResponse,
   AsyncTaskResponse,
@@ -50,6 +55,19 @@ const DEFAULT_CRAWL_TIMEOUT_MS = 3_600_000;
 
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+const nextCursor = (next: string | undefined): string | undefined => {
+  if (!next) {
+    return undefined;
+  }
+  const cursor = new URL(next).searchParams.get('cursor');
+  if (!cursor) {
+    throw new Error(
+      `Crawl results next link has no cursor: ${next}. Use getCrawlResults() to fetch every page.`,
+    );
+  }
+  return cursor;
+};
 
 export class WebScrapingApi {
   private readonly http: HttpClient;
@@ -147,6 +165,26 @@ export class WebScrapingApi {
     return this.http.get<GetCrawlStatusResponse>(
       this.crawlPath('getCrawlStatus', crawlId, 'getCrawlStatus'),
     );
+  }
+
+  async listCrawlPages(
+    crawlId: string,
+    { cursor, content = true }: CrawlPagesOptions = {},
+  ): Promise<CrawlPageList> {
+    const query: Record<string, string> = {};
+    if (content) {
+      query.type = 'content';
+    }
+    if (cursor) {
+      query.cursor = cursor;
+    }
+
+    const res = await this.http.get<ListCrawlPagesResponse>(
+      this.crawlPath('listCrawlPages', crawlId, 'listCrawlPages'),
+      query,
+    );
+
+    return { pages: res.url, next: nextCursor(res.next), total: res.total };
   }
 
   async getCrawlResults(
