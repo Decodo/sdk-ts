@@ -56,6 +56,19 @@ const DEFAULT_CRAWL_TIMEOUT_MS = 3_600_000;
 const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
+const nextCursor = (next: string | undefined): string | undefined => {
+  if (!next) {
+    return undefined;
+  }
+  const cursor = new URL(next).searchParams.get('cursor');
+  if (!cursor) {
+    throw new Error(
+      `Crawl results next link has no cursor: ${next}. Use getCrawlResults() to fetch every page.`,
+    );
+  }
+  return cursor;
+};
+
 export class WebScrapingApi {
   private readonly http: HttpClient;
   private readonly schemas: DecodoSchema;
@@ -171,29 +184,27 @@ export class WebScrapingApi {
       query,
     );
 
-    return {
-      pages: res.url,
-      next: res.next
-        ? (new URL(res.next).searchParams.get('cursor') ?? undefined)
-        : undefined,
-      total: res.total,
-    };
+    return { pages: res.url, next: nextCursor(res.next), total: res.total };
   }
 
   async getCrawlResults(
     crawlId: string,
     { content = true }: CrawlResultsOptions = {},
   ): Promise<CrawlPage[]> {
+    const path = this.crawlPath('listCrawlPages', crawlId, 'getCrawlResults');
     const pages: CrawlPage[] = [];
-    let cursor: string | undefined;
+    let query = content ? '?type=content' : '';
 
-    do {
-      const page = await this.listCrawlPages(crawlId, { cursor, content });
-      pages.push(...page.pages);
-      cursor = page.next;
-    } while (cursor);
-
-    return pages;
+    for (;;) {
+      const page = await this.http.get<ListCrawlPagesResponse>(
+        `${path}${query}`,
+      );
+      pages.push(...page.url);
+      if (!page.next) {
+        return pages;
+      }
+      query = new URL(page.next).search;
+    }
   }
 
   async cancelCrawl(crawlId: string): Promise<CancelCrawlResponse> {
