@@ -1,6 +1,6 @@
 {
   "name": "@decodo/sdk-ts",
-  "version": "2.7.0",
+  "version": "0.0.0-semantic-release",
   "description": "Official TypeScript SDK for the Decodo APIs",
   "license": "MIT",
   "repository": {
@@ -52,10 +52,12 @@
     "@eslint/js": "^9.39.1",
     "@types/json-schema": "^7.0.15",
     "@types/node": "^25.7.0",
+    "conventional-changelog-conventionalcommits": "^9.3.1",
     "dts-bundle-generator": "^9.5.1",
     "esbuild": "^0.28.0",
     "eslint": "^9.39.1",
     "json-schema-to-typescript": "^15.0.4",
+    "semantic-release": "^25.0.9",
     "tsx": "^4.19.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.40.0",
@@ -63,5 +65,6 @@
   },
   "dependencies": {
     "zod": "^4"
-  }
+  },
+  "packageManager": "pnpm@10.33.3"
 }
