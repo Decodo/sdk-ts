@@ -469,7 +469,13 @@ const { status, pages } = await client.webScrapingApi.crawl(
   { url: 'https://example.com', limit: 50, output: 'markdown' },
   { pollInterval: 5_000, timeout: 600_000 },
 );
+
+if (status.status !== 'done') {
+  console.warn(`Crawl ended ${status.status}; ${pages.length} pages collected`);
+}
 ```
+
+`crawl` doesn't throw when a crawl ends `faulted`, `cancelled` or `truncated`. It returns the pages collected so far, and `status` is the full crawl status object, so check `status.status` before relying on `pages`. If the crawl hasn't settled before `timeout`, `crawl` throws a `TimeoutError` and the crawl keeps running on the server; call `cancelCrawl` to stop it.
 
 To drive a crawl step by step, start it and poll separately for status and pages:
 
