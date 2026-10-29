@@ -4,21 +4,6 @@ import * as z from 'zod';
 import { Target } from './targets.js';
 
 export const requestJsonSchemas = {
-  [Target.UniversalEcommerce]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "universal_ecommerce"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.GoogleSearch]: {
     "type": "object",
     "properties": {
@@ -150,150 +135,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.GoogleTrendsExplore]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "google_trends_explore"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "geo": {
-        "type": "string"
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "search_type": {
-        "type": "string"
-      },
-      "date_start": {
-        "type": "string"
-      },
-      "date_end": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.GoogleShoppingSearch]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "google_shopping_search"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "page_from": {
-        "type": "number",
-        "minimum": 0,
-        "maximum": 100
-      },
-      "google_tbs": {
-        "type": "string"
-      },
-      "parse": {
-        "type": "boolean"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "google_results_language": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.GoogleShoppingProduct]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "google_shopping_product"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "page_from": {
-        "type": "number",
-        "minimum": 0,
-        "maximum": 100
-      },
-      "parse": {
-        "type": "boolean"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "google_results_language": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "xhr": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.Google]: {
     "type": "object",
     "properties": {
@@ -333,95 +174,6 @@ export const requestJsonSchemas = {
         "type": "number",
         "minimum": 1,
         "maximum": 10
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.GoogleSuggest]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "google_suggest"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "locale": {
-        "type": "string"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.GoogleMaps]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "google_maps"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "geo": {
-        "type": "string"
-      },
-      "locale": {
-        "type": "string"
-      },
-      "page_from": {
-        "type": "number",
-        "minimum": 0,
-        "maximum": 100
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "session_id": {
-        "type": "string"
-      },
-      "google_results_language": {
-        "type": "string"
-      },
-      "google_nfpr": {
-        "type": "boolean"
-      },
-      "hotel_occupancy": {
-        "type": "string"
-      },
-      "date_range": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
       },
       "callback_url": {
         "type": "string"
@@ -675,31 +427,6 @@ export const requestJsonSchemas = {
       },
       "xhr": {
         "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.YoutubeTranscript]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "youtube_transcript"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "language_code": {
-        "type": "string"
-      },
-      "transcript_origin": {
-        "type": "string"
       },
       "callback_url": {
         "type": "string"
@@ -1024,47 +751,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.Ecommerce]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "ecommerce"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "parse": {
-        "type": "boolean"
-      },
-      "parser_type": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.WalmartProduct]: {
     "type": "object",
     "properties": {
@@ -1314,50 +1000,6 @@ export const requestJsonSchemas = {
       },
       "target_store_id": {
         "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.LowesSearch]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "lowes_search"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "lowes_store_id": {
-        "type": "string"
-      },
-      "headless": {
-        "type": "string",
-        "enum": [
-          "html",
-          "png"
-        ]
-      },
-      "delivery_zip": {
-        "type": "string"
-      },
-      "user_agent_type": {
-        "type": "string"
-      },
-      "free_delivery": {
-        "type": "boolean"
-      },
-      "pickup_today": {
-        "type": "boolean"
-      },
-      "delivery_today_tomorrow": {
-        "type": "boolean"
       },
       "callback_url": {
         "type": "string"
@@ -1732,25 +1374,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.InstagramGraphqlProfile]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "instagram_graphql_profile"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.TiktokPost]: {
     "type": "object",
     "properties": {
@@ -1952,28 +1575,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.YoutubeVideo]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "youtube_video"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "geo": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.YoutubeMetadata]: {
     "type": "object",
     "properties": {
@@ -2057,73 +1658,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.YoutubeSearchMax]: {
-    "type": "object",
-    "properties": {
-      "360": {
-        "type": "boolean"
-      },
-      "target": {
-        "const": "youtube_search_max"
-      },
-      "query": {
-        "type": "string",
-        "maxLength": 2048
-      },
-      "upload_date": {
-        "type": "string"
-      },
-      "type": {
-        "type": "string"
-      },
-      "duration": {
-        "type": "string"
-      },
-      "video_sort_by": {
-        "type": "string"
-      },
-      "3d": {
-        "type": "boolean"
-      },
-      "4k": {
-        "type": "boolean"
-      },
-      "creative_commons": {
-        "type": "boolean"
-      },
-      "hd": {
-        "type": "boolean"
-      },
-      "hdr": {
-        "type": "boolean"
-      },
-      "vr180": {
-        "type": "boolean"
-      },
-      "live": {
-        "type": "boolean"
-      },
-      "location": {
-        "type": "boolean"
-      },
-      "purchased": {
-        "type": "boolean"
-      },
-      "subtitles": {
-        "type": "boolean"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.YoutubeSubtitles]: {
     "type": "object",
     "properties": {
@@ -2182,35 +1716,26 @@ export const requestJsonSchemas = {
 } as const;
 
 export const requestSchemas: Record<Target, z.ZodType> = {
-  [Target.UniversalEcommerce]: z.fromJSONSchema(requestJsonSchemas[Target.UniversalEcommerce] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.GoogleSearch]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.GoogleTravelHotels]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleTravelHotels] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.GoogleTrendsExplore]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleTrendsExplore] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.GoogleShoppingSearch]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleShoppingSearch] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.GoogleShoppingProduct]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleShoppingProduct] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Google]: z.fromJSONSchema(requestJsonSchemas[Target.Google] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.GoogleSuggest]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleSuggest] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.GoogleMaps]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleMaps] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.GoogleAiMode]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleAiMode] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.GoogleAds]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleAds] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.GoogleLens]: z.fromJSONSchema(requestJsonSchemas[Target.GoogleLens] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.BingSearch]: z.fromJSONSchema(requestJsonSchemas[Target.BingSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Bing]: z.fromJSONSchema(requestJsonSchemas[Target.Bing] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.YoutubeTranscript]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeTranscript] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AmazonProduct]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonProduct] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AmazonPricing]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonPricing] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AmazonSearch]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AmazonSellers]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonSellers] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AmazonBestsellers]: z.fromJSONSchema(requestJsonSchemas[Target.AmazonBestsellers] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Amazon]: z.fromJSONSchema(requestJsonSchemas[Target.Amazon] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.Ecommerce]: z.fromJSONSchema(requestJsonSchemas[Target.Ecommerce] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.WalmartProduct]: z.fromJSONSchema(requestJsonSchemas[Target.WalmartProduct] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.WalmartSearch]: z.fromJSONSchema(requestJsonSchemas[Target.WalmartSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Walmart]: z.fromJSONSchema(requestJsonSchemas[Target.Walmart] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.TargetProduct]: z.fromJSONSchema(requestJsonSchemas[Target.TargetProduct] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.TargetSearch]: z.fromJSONSchema(requestJsonSchemas[Target.TargetSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Target]: z.fromJSONSchema(requestJsonSchemas[Target.Target] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.LowesSearch]: z.fromJSONSchema(requestJsonSchemas[Target.LowesSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Universal]: z.fromJSONSchema(requestJsonSchemas[Target.Universal] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Chatgpt]: z.fromJSONSchema(requestJsonSchemas[Target.Chatgpt] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Perplexity]: z.fromJSONSchema(requestJsonSchemas[Target.Perplexity] as unknown as z.core.JSONSchema.JSONSchema),
@@ -2220,7 +1745,6 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.Mobile]: z.fromJSONSchema(requestJsonSchemas[Target.Mobile] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.Airbnb]: z.fromJSONSchema(requestJsonSchemas[Target.Airbnb] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.AppleAppStore]: z.fromJSONSchema(requestJsonSchemas[Target.AppleAppStore] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.InstagramGraphqlProfile]: z.fromJSONSchema(requestJsonSchemas[Target.InstagramGraphqlProfile] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.TiktokPost]: z.fromJSONSchema(requestJsonSchemas[Target.TiktokPost] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.TiktokShopSearch]: z.fromJSONSchema(requestJsonSchemas[Target.TiktokShopSearch] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.TiktokShopProduct]: z.fromJSONSchema(requestJsonSchemas[Target.TiktokShopProduct] as unknown as z.core.JSONSchema.JSONSchema),
@@ -2228,10 +1752,8 @@ export const requestSchemas: Record<Target, z.ZodType> = {
   [Target.RedditPost]: z.fromJSONSchema(requestJsonSchemas[Target.RedditPost] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.RedditSubreddit]: z.fromJSONSchema(requestJsonSchemas[Target.RedditSubreddit] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.RedditUser]: z.fromJSONSchema(requestJsonSchemas[Target.RedditUser] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.YoutubeVideo]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeVideo] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeMetadata]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeMetadata] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeSearch]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSearch] as unknown as z.core.JSONSchema.JSONSchema),
-  [Target.YoutubeSearchMax]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSearchMax] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeSubtitles]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSubtitles] as unknown as z.core.JSONSchema.JSONSchema),
   [Target.YoutubeChannel]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeChannel] as unknown as z.core.JSONSchema.JSONSchema),
 };
