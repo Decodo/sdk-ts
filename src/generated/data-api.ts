@@ -349,13 +349,13 @@ export interface CancelCrawlResponse {
 }
 
 export const dataApiEndpoints = {
-  runSearch: { method: 'POST', path: '/v1/search' },
-  mapSite: { method: 'POST', path: '/v1/map' },
-  listCrawls: { method: 'GET', path: '/v1/crawl' },
-  startCrawl: { method: 'POST', path: '/v1/crawl' },
-  listCrawlPages: { method: 'GET', path: '/v1/crawl/{id}' },
-  getCrawlStatus: { method: 'GET', path: '/v1/crawl/{id}/status' },
-  cancelCrawl: { method: 'POST', path: '/v1/crawl/{id}/cancel' },
+  runSearch: { method: "POST", path: "/v1/search" },
+  mapSite: { method: "POST", path: "/v1/map" },
+  listCrawls: { method: "GET", path: "/v1/crawl" },
+  startCrawl: { method: "POST", path: "/v1/crawl" },
+  listCrawlPages: { method: "GET", path: "/v1/crawl/{id}" },
+  getCrawlStatus: { method: "GET", path: "/v1/crawl/{id}/status" },
+  cancelCrawl: { method: "POST", path: "/v1/crawl/{id}/cancel" },
 } as const;
 
 export type DataApiEndpoint = keyof typeof dataApiEndpoints;
