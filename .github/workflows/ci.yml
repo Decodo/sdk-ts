@@ -24,3 +24,16 @@ jobs:
       - run: pnpm test
       - run: pnpm run build:esm
       - run: pnpm run build:cjs
+
+  generated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run codegen
+      - run: git add --intent-to-add src/generated && git diff --exit-code src/generated

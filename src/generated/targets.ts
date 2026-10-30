@@ -4,35 +4,26 @@
  * Scrape target discriminator (wire string values).
  */
 export enum Target {
-  UniversalEcommerce = 'universal_ecommerce',
   GoogleSearch = 'google_search',
   GoogleTravelHotels = 'google_travel_hotels',
-  GoogleTrendsExplore = 'google_trends_explore',
-  GoogleShoppingSearch = 'google_shopping_search',
-  GoogleShoppingProduct = 'google_shopping_product',
   Google = 'google',
-  GoogleSuggest = 'google_suggest',
-  GoogleMaps = 'google_maps',
   GoogleAiMode = 'google_ai_mode',
   GoogleAds = 'google_ads',
   GoogleLens = 'google_lens',
   BingSearch = 'bing_search',
   Bing = 'bing',
-  YoutubeTranscript = 'youtube_transcript',
   AmazonProduct = 'amazon_product',
   AmazonPricing = 'amazon_pricing',
   AmazonSearch = 'amazon_search',
   AmazonSellers = 'amazon_sellers',
   AmazonBestsellers = 'amazon_bestsellers',
   Amazon = 'amazon',
-  Ecommerce = 'ecommerce',
   WalmartProduct = 'walmart_product',
   WalmartSearch = 'walmart_search',
   Walmart = 'walmart',
   TargetProduct = 'target_product',
   TargetSearch = 'target_search',
   Target = 'target',
-  LowesSearch = 'lowes_search',
   Universal = 'universal',
   Chatgpt = 'chatgpt',
   Perplexity = 'perplexity',
@@ -42,7 +33,6 @@ export enum Target {
   Mobile = 'mobile',
   Airbnb = 'airbnb',
   AppleAppStore = 'apple_app_store',
-  InstagramGraphqlProfile = 'instagram_graphql_profile',
   TiktokPost = 'tiktok_post',
   TiktokShopSearch = 'tiktok_shop_search',
   TiktokShopProduct = 'tiktok_shop_product',
@@ -50,10 +40,8 @@ export enum Target {
   RedditPost = 'reddit_post',
   RedditSubreddit = 'reddit_subreddit',
   RedditUser = 'reddit_user',
-  YoutubeVideo = 'youtube_video',
   YoutubeMetadata = 'youtube_metadata',
   YoutubeSearch = 'youtube_search',
-  YoutubeSearchMax = 'youtube_search_max',
   YoutubeSubtitles = 'youtube_subtitles',
   YoutubeChannel = 'youtube_channel'
 }
@@ -61,11 +49,7 @@ export enum Target {
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.UniversalEcommerce, Target.GoogleSearch, Target.GoogleTravelHotels, Target.GoogleTrendsExplore, Target.GoogleShoppingSearch, Target.GoogleShoppingProduct, Target.Google, Target.GoogleSuggest, Target.GoogleMaps, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.YoutubeTranscript, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.Ecommerce, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.LowesSearch, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.InstagramGraphqlProfile, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeVideo, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSearchMax, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
-
-export interface UniversalEcommerceParams {
-  callback_url?: string;
-}
+export const targets = [Target.GoogleSearch, Target.GoogleTravelHotels, Target.Google, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
 
 export interface GoogleSearchParams {
   query?: string;
@@ -102,46 +86,6 @@ export interface GoogleTravelHotelsParams {
   callback_url?: string;
 }
 
-export interface GoogleTrendsExploreParams {
-  query?: string;
-  geo?: string;
-  device_type?: string;
-  search_type?: string;
-  date_start?: string;
-  date_end?: string;
-  callback_url?: string;
-}
-
-export interface GoogleShoppingSearchParams {
-  query?: string;
-  headless?: 'html' | 'png';
-  locale?: string;
-  geo?: string;
-  device_type?: string;
-  page_from?: number;
-  google_tbs?: string;
-  parse?: boolean;
-  session_id?: string;
-  google_results_language?: string;
-  markdown?: boolean;
-  callback_url?: string;
-}
-
-export interface GoogleShoppingProductParams {
-  query?: string;
-  headless?: 'html' | 'png';
-  locale?: string;
-  geo?: string;
-  device_type?: string;
-  page_from?: number;
-  parse?: boolean;
-  session_id?: string;
-  google_results_language?: string;
-  markdown?: boolean;
-  xhr?: boolean;
-  callback_url?: string;
-}
-
 export interface GoogleParams {
   url?: string;
   headless?: 'html' | 'png';
@@ -152,31 +96,6 @@ export interface GoogleParams {
   markdown?: boolean;
   xhr?: boolean;
   page_count?: number;
-  callback_url?: string;
-}
-
-export interface GoogleSuggestParams {
-  query?: string;
-  device_type?: string;
-  geo?: string;
-  locale?: string;
-  session_id?: string;
-  callback_url?: string;
-}
-
-export interface GoogleMapsParams {
-  query?: string;
-  headless?: 'html' | 'png';
-  geo?: string;
-  locale?: string;
-  page_from?: number;
-  device_type?: string;
-  session_id?: string;
-  google_results_language?: string;
-  google_nfpr?: boolean;
-  hotel_occupancy?: string;
-  date_range?: string;
-  markdown?: boolean;
   callback_url?: string;
 }
 
@@ -246,13 +165,6 @@ export interface BingParams {
   session_id?: string;
   markdown?: boolean;
   xhr?: boolean;
-  callback_url?: string;
-}
-
-export interface YoutubeTranscriptParams {
-  query?: string;
-  language_code?: string;
-  transcript_origin?: string;
   callback_url?: string;
 }
 
@@ -344,17 +256,6 @@ export interface AmazonParams {
   callback_url?: string;
 }
 
-export interface EcommerceParams {
-  url?: string;
-  headless?: 'html' | 'png';
-  locale?: string;
-  geo?: string;
-  device_type?: string;
-  parse?: boolean;
-  parser_type?: string;
-  callback_url?: string;
-}
-
 export interface WalmartProductParams {
   product_id?: string;
   headless?: 'html' | 'png';
@@ -423,18 +324,6 @@ export interface TargetParams {
   xhr?: boolean;
   delivery_zip?: string;
   target_store_id?: string;
-  callback_url?: string;
-}
-
-export interface LowesSearchParams {
-  query?: string;
-  lowes_store_id?: string;
-  headless?: 'html' | 'png';
-  delivery_zip?: string;
-  user_agent_type?: string;
-  free_delivery?: boolean;
-  pickup_today?: boolean;
-  delivery_today_tomorrow?: boolean;
   callback_url?: string;
 }
 
@@ -541,11 +430,6 @@ export interface AppleAppStoreParams {
   callback_url?: string;
 }
 
-export interface InstagramGraphqlProfileParams {
-  query?: string;
-  callback_url?: string;
-}
-
 export interface TiktokPostParams {
   url?: string;
   xhr?: boolean;
@@ -600,12 +484,6 @@ export interface RedditUserParams {
   callback_url?: string;
 }
 
-export interface YoutubeVideoParams {
-  query?: string;
-  geo?: string;
-  callback_url?: string;
-}
-
 export interface YoutubeMetadataParams {
   query?: string;
   callback_url?: string;
@@ -631,27 +509,6 @@ export interface YoutubeSearchParams {
   callback_url?: string;
 }
 
-export interface YoutubeSearchMaxParams {
-  '360'?: boolean;
-  query?: string;
-  upload_date?: string;
-  type?: string;
-  duration?: string;
-  video_sort_by?: string;
-  '3d'?: boolean;
-  '4k'?: boolean;
-  creative_commons?: boolean;
-  hd?: boolean;
-  hdr?: boolean;
-  vr180?: boolean;
-  live?: boolean;
-  location?: boolean;
-  purchased?: boolean;
-  subtitles?: boolean;
-  markdown?: boolean;
-  callback_url?: string;
-}
-
 export interface YoutubeSubtitlesParams {
   query?: string;
   language_code?: string;
@@ -668,35 +525,26 @@ export interface YoutubeChannelParams {
 }
 
 export type TargetParamsMap = {
-  [Target.UniversalEcommerce]: UniversalEcommerceParams;
   [Target.GoogleSearch]: GoogleSearchParams;
   [Target.GoogleTravelHotels]: GoogleTravelHotelsParams;
-  [Target.GoogleTrendsExplore]: GoogleTrendsExploreParams;
-  [Target.GoogleShoppingSearch]: GoogleShoppingSearchParams;
-  [Target.GoogleShoppingProduct]: GoogleShoppingProductParams;
   [Target.Google]: GoogleParams;
-  [Target.GoogleSuggest]: GoogleSuggestParams;
-  [Target.GoogleMaps]: GoogleMapsParams;
   [Target.GoogleAiMode]: GoogleAiModeParams;
   [Target.GoogleAds]: GoogleAdsParams;
   [Target.GoogleLens]: GoogleLensParams;
   [Target.BingSearch]: BingSearchParams;
   [Target.Bing]: BingParams;
-  [Target.YoutubeTranscript]: YoutubeTranscriptParams;
   [Target.AmazonProduct]: AmazonProductParams;
   [Target.AmazonPricing]: AmazonPricingParams;
   [Target.AmazonSearch]: AmazonSearchParams;
   [Target.AmazonSellers]: AmazonSellersParams;
   [Target.AmazonBestsellers]: AmazonBestsellersParams;
   [Target.Amazon]: AmazonParams;
-  [Target.Ecommerce]: EcommerceParams;
   [Target.WalmartProduct]: WalmartProductParams;
   [Target.WalmartSearch]: WalmartSearchParams;
   [Target.Walmart]: WalmartParams;
   [Target.TargetProduct]: TargetProductParams;
   [Target.TargetSearch]: TargetSearchParams;
   [Target.Target]: TargetParams;
-  [Target.LowesSearch]: LowesSearchParams;
   [Target.Universal]: UniversalParams;
   [Target.Chatgpt]: ChatgptParams;
   [Target.Perplexity]: PerplexityParams;
@@ -706,7 +554,6 @@ export type TargetParamsMap = {
   [Target.Mobile]: MobileParams;
   [Target.Airbnb]: AirbnbParams;
   [Target.AppleAppStore]: AppleAppStoreParams;
-  [Target.InstagramGraphqlProfile]: InstagramGraphqlProfileParams;
   [Target.TiktokPost]: TiktokPostParams;
   [Target.TiktokShopSearch]: TiktokShopSearchParams;
   [Target.TiktokShopProduct]: TiktokShopProductParams;
@@ -714,10 +561,8 @@ export type TargetParamsMap = {
   [Target.RedditPost]: RedditPostParams;
   [Target.RedditSubreddit]: RedditSubredditParams;
   [Target.RedditUser]: RedditUserParams;
-  [Target.YoutubeVideo]: YoutubeVideoParams;
   [Target.YoutubeMetadata]: YoutubeMetadataParams;
   [Target.YoutubeSearch]: YoutubeSearchParams;
-  [Target.YoutubeSearchMax]: YoutubeSearchMaxParams;
   [Target.YoutubeSubtitles]: YoutubeSubtitlesParams;
   [Target.YoutubeChannel]: YoutubeChannelParams;
 };
@@ -737,11 +582,6 @@ export type TargetMeta = {
 };
 
 export const targetMeta: Record<Target, TargetMeta> = {
-  [Target.UniversalEcommerce]: {
-    group: "None",
-    response_format: "html",
-    parameters: ["callback_url"],
-  },
   [Target.GoogleSearch]: {
     group: "Google",
     response_format: "json",
@@ -752,35 +592,10 @@ export const targetMeta: Record<Target, TargetMeta> = {
     response_format: "html",
     parameters: ["query", "headless", "locale", "device_type", "page_from", "date_range", "stars", "adults", "children", "session_id", "markdown", "callback_url"],
   },
-  [Target.GoogleTrendsExplore]: {
-    group: "Google",
-    response_format: "json",
-    parameters: ["query", "geo", "device_type", "search_type", "date_start", "date_end", "callback_url"],
-  },
-  [Target.GoogleShoppingSearch]: {
-    group: "Google",
-    response_format: "json",
-    parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "google_tbs", "parse", "session_id", "google_results_language", "markdown", "callback_url"],
-  },
-  [Target.GoogleShoppingProduct]: {
-    group: "Google",
-    response_format: "json",
-    parameters: ["query", "headless", "locale", "geo", "device_type", "page_from", "parse", "session_id", "google_results_language", "markdown", "xhr", "callback_url"],
-  },
   [Target.Google]: {
     group: "Google",
     response_format: "json",
     parameters: ["url", "headless", "locale", "device_type", "parse", "session_id", "markdown", "xhr", "page_count", "callback_url"],
-  },
-  [Target.GoogleSuggest]: {
-    group: "Google",
-    response_format: "json",
-    parameters: ["query", "device_type", "geo", "locale", "session_id", "callback_url"],
-  },
-  [Target.GoogleMaps]: {
-    group: "Google",
-    response_format: "html",
-    parameters: ["query", "headless", "geo", "locale", "page_from", "device_type", "session_id", "google_results_language", "google_nfpr", "hotel_occupancy", "date_range", "markdown", "callback_url"],
   },
   [Target.GoogleAiMode]: {
     group: "AI Tools",
@@ -806,11 +621,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "Bing",
     response_format: "json",
     parameters: ["url", "headless", "locale", "geo", "device_type", "page_from", "parse", "session_id", "markdown", "xhr", "callback_url"],
-  },
-  [Target.YoutubeTranscript]: {
-    group: "YouTube",
-    response_format: "json",
-    parameters: ["query", "language_code", "transcript_origin", "callback_url"],
   },
   [Target.AmazonProduct]: {
     group: "Amazon",
@@ -842,11 +652,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     response_format: "json",
     parameters: ["url", "headless", "device_type", "parse", "geo", "session_id", "markdown", "xhr", "callback_url"],
   },
-  [Target.Ecommerce]: {
-    group: "Other eCommerce",
-    response_format: "json",
-    parameters: ["url", "headless", "locale", "geo", "device_type", "parse", "parser_type", "callback_url"],
-  },
   [Target.WalmartProduct]: {
     group: "Walmart",
     response_format: "html",
@@ -876,11 +681,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "Target",
     response_format: "html",
     parameters: ["url", "headless", "device_type", "xhr", "delivery_zip", "target_store_id", "callback_url"],
-  },
-  [Target.LowesSearch]: {
-    group: "Lowe's",
-    response_format: "json",
-    parameters: ["query", "lowes_store_id", "headless", "delivery_zip", "user_agent_type", "free_delivery", "pickup_today", "delivery_today_tomorrow", "callback_url"],
   },
   [Target.Universal]: {
     group: "Universal",
@@ -927,11 +727,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     response_format: "html",
     parameters: ["url", "headless", "geo", "device_type", "markdown", "xhr", "callback_url"],
   },
-  [Target.InstagramGraphqlProfile]: {
-    group: "Instagram",
-    response_format: "json",
-    parameters: ["query", "callback_url"],
-  },
   [Target.TiktokPost]: {
     group: "TikTok",
     response_format: "html",
@@ -967,11 +762,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     response_format: "json",
     parameters: ["url", "locale", "geo", "sort", "callback_url"],
   },
-  [Target.YoutubeVideo]: {
-    group: "None",
-    response_format: "json",
-    parameters: ["query", "geo", "callback_url"],
-  },
   [Target.YoutubeMetadata]: {
     group: "YouTube",
     response_format: "json",
@@ -981,11 +771,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "YouTube",
     response_format: "json",
     parameters: ["360", "query", "upload_date", "type", "duration", "video_sort_by", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "callback_url"],
-  },
-  [Target.YoutubeSearchMax]: {
-    group: "YouTube",
-    response_format: "json",
-    parameters: ["360", "query", "upload_date", "type", "duration", "video_sort_by", "3d", "4k", "creative_commons", "hd", "hdr", "vr180", "live", "location", "purchased", "subtitles", "markdown", "callback_url"],
   },
   [Target.YoutubeSubtitles]: {
     group: "YouTube",
