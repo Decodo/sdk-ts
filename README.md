@@ -550,18 +550,6 @@ For the full target list and parameter details, see the API documentation:
 - [Target list](https://help.decodo.com/docs/web-scraping-api-targets)
 - [Parameters](https://help.decodo.com/docs/web-scraping-api-parameters)
 
-## Request schemas
-
-Every request is also exported as a zod object schema, to validate input or build tool
-definitions: `requestSchemas` per scrape target, and `dataApiRequestSchemas` for `runSearch`,
-`mapSite` and `startCrawl`.
-
-```typescript
-import { dataApiRequestSchemas } from '@decodo/sdk-ts';
-
-const crawlInput = dataApiRequestSchemas.startCrawl.pick({ url: true, limit: true }).strict();
-```
-
 ## Error handling
 
 The SDK throws typed errors that map to API error codes:
