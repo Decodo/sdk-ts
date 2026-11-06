@@ -18,6 +18,8 @@ export {
   targetMeta,
   Target,
 } from './generated/targets.js';
+export { requestSchemas } from './generated/request-schemas.js';
+export { dataApiRequestSchemas } from './generated/data-api.js';
 export { parameterMeta } from './generated/parameters.js';
 export type { ParameterMeta } from './generated/parameters.js';
 
