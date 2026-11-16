@@ -30,11 +30,11 @@ const renderGeneratedModule = (api: WebScrapingApiIR): string => {
   }
   lines.push('} as const;');
   lines.push('');
-  lines.push('export const requestSchemas: Record<Target, z.ZodType> = {');
+  lines.push('export const requestSchemas: Record<Target, z.ZodObject> = {');
   for (const [targetKey] of entries) {
     const member = toEnumMemberName(targetKey);
     lines.push(
-      `  [Target.${member}]: z.fromJSONSchema(requestJsonSchemas[Target.${member}] as unknown as z.core.JSONSchema.JSONSchema),`,
+      `  [Target.${member}]: z.fromJSONSchema(requestJsonSchemas[Target.${member}] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,`,
     );
   }
   lines.push('};');
@@ -47,14 +47,18 @@ export const generateParameterSchemasFile = async (): Promise<void> => {
   const api = ir.apis.webScrapingApi;
 
   for (const [targetKey, target] of Object.entries(api.targets)) {
+    let schema: z.ZodType;
     try {
-      z.fromJSONSchema(
+      schema = z.fromJSONSchema(
         target.parameter_schema as unknown as z.core.JSONSchema.JSONSchema,
       );
     } catch (err) {
       throw new Error(
         `Invalid parameter_schema for target "${targetKey}": ${(err as Error).message}`,
       );
+    }
+    if (!(schema instanceof z.ZodObject)) {
+      throw new Error(`parameter_schema of target "${targetKey}" is not an object.`);
     }
   }
 
