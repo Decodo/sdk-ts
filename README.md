@@ -8,9 +8,9 @@
 <p align="center">
 <a href="https://dashboard.decodo.com/integrations?utm_source=github&utm_medium=social&utm_campaign=mcp_server"> <img src="https://github.com/user-attachments/assets/a1e52a9e-3da1-4081-b3c6-053aafb8f196"/></a>
 
-The official TypeScript SDK for the Decodo Web Scraping API.
+The official TypeScript SDK for the Decodo Web Data API.
 
-Build strongly typed scraping workflows for search engines, eCommerce platforms, social media, AI tools, and more using the Decodo Web Scraping API.
+Build strongly typed scraping workflows for search engines, eCommerce platforms, social media, AI tools, and more using the Decodo Web Data API.
 
 - Fully typed targets and parameters with IDE autocomplete
 - Sync, async, and batch scraping methods
@@ -20,7 +20,7 @@ Build strongly typed scraping workflows for search engines, eCommerce platforms,
 
 # What is Decodo TypeScript SDK?
 
-Decodo TypeScript SDK is the official TypeScript SDK for the Decodo Web Scraping API. It provides a typed interface for interacting with Decodo targets like Google, Amazon, TikTok, YouTube, ChatGPT, Perplexity, and more.
+Decodo TypeScript SDK is the official TypeScript SDK for the Decodo Web Data API. It provides a typed interface for interacting with Decodo targets like Google, Amazon, TikTok, YouTube, ChatGPT, Perplexity, and more.
 
 Instead of manually constructing HTTP requests and validating payloads, you can work with fully typed methods and target-specific parameters directly in your editor.
 
@@ -381,7 +381,7 @@ const client = new DecodoClient({
 | `token`     | Web Scraping API basic authentication token, for older plans. Use it instead of `apiKey` |
 | `timeoutMs` | Request timeout in milliseconds (default: 180000)                                        |
 
-## Web Scraping API
+## Web Data API
 
 Access the API via `client.webScrapingApi`.
 
