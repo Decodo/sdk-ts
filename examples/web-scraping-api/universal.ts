@@ -11,6 +11,7 @@ const res = await client.webScrapingApi.scrape({
   url: 'https://www.example.com',
   geo: 'United States',
   markdown: true,
+  main_content: true,
 });
 
 console.log(JSON.stringify(res, null, 2));

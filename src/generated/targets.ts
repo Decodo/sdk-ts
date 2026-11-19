@@ -37,9 +37,6 @@ export enum Target {
   TiktokShopSearch = 'tiktok_shop_search',
   TiktokShopProduct = 'tiktok_shop_product',
   Tiktok = 'tiktok',
-  RedditPost = 'reddit_post',
-  RedditSubreddit = 'reddit_subreddit',
-  RedditUser = 'reddit_user',
   YoutubeMetadata = 'youtube_metadata',
   YoutubeSearch = 'youtube_search',
   YoutubeSubtitles = 'youtube_subtitles',
@@ -49,7 +46,7 @@ export enum Target {
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.GoogleSearch, Target.GoogleTravelHotels, Target.Google, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.RedditPost, Target.RedditSubreddit, Target.RedditUser, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
+export const targets = [Target.GoogleSearch, Target.GoogleTravelHotels, Target.Google, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
 
 export interface GoogleSearchParams {
   query?: string;
@@ -348,6 +345,7 @@ export interface UniversalParams {
   force_cookies?: boolean;
   xhr?: boolean;
   markdown?: boolean;
+  main_content?: boolean;
   callback_url?: string;
 }
 
@@ -462,28 +460,6 @@ export interface TiktokParams {
   callback_url?: string;
 }
 
-export interface RedditPostParams {
-  url?: string;
-  locale?: string;
-  geo?: string;
-  callback_url?: string;
-}
-
-export interface RedditSubredditParams {
-  url?: string;
-  locale?: string;
-  geo?: string;
-  callback_url?: string;
-}
-
-export interface RedditUserParams {
-  url?: string;
-  locale?: string;
-  geo?: string;
-  sort?: string;
-  callback_url?: string;
-}
-
 export interface YoutubeMetadataParams {
   query?: string;
   callback_url?: string;
@@ -558,9 +534,6 @@ export type TargetParamsMap = {
   [Target.TiktokShopSearch]: TiktokShopSearchParams;
   [Target.TiktokShopProduct]: TiktokShopProductParams;
   [Target.Tiktok]: TiktokParams;
-  [Target.RedditPost]: RedditPostParams;
-  [Target.RedditSubreddit]: RedditSubredditParams;
-  [Target.RedditUser]: RedditUserParams;
   [Target.YoutubeMetadata]: YoutubeMetadataParams;
   [Target.YoutubeSearch]: YoutubeSearchParams;
   [Target.YoutubeSubtitles]: YoutubeSubtitlesParams;
@@ -685,7 +658,7 @@ export const targetMeta: Record<Target, TargetMeta> = {
   [Target.Universal]: {
     group: "Universal",
     response_format: "html",
-    parameters: ["url", "payload", "proxy_pool", "http_method", "headless", "geo", "locale", "device_type", "session_id", "successful_status_codes", "headers", "cookies", "force_headers", "force_cookies", "xhr", "markdown", "callback_url"],
+    parameters: ["url", "payload", "proxy_pool", "http_method", "headless", "geo", "locale", "device_type", "session_id", "successful_status_codes", "headers", "cookies", "force_headers", "force_cookies", "xhr", "markdown", "main_content", "callback_url"],
   },
   [Target.Chatgpt]: {
     group: "AI Tools",
@@ -746,21 +719,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "TikTok",
     response_format: "html",
     parameters: ["url", "headless", "user_agent_type", "callback_url"],
-  },
-  [Target.RedditPost]: {
-    group: "Reddit",
-    response_format: "json",
-    parameters: ["url", "locale", "geo", "callback_url"],
-  },
-  [Target.RedditSubreddit]: {
-    group: "Reddit",
-    response_format: "json",
-    parameters: ["url", "locale", "geo", "callback_url"],
-  },
-  [Target.RedditUser]: {
-    group: "Reddit",
-    response_format: "json",
-    parameters: ["url", "locale", "geo", "sort", "callback_url"],
   },
   [Target.YoutubeMetadata]: {
     group: "YouTube",
