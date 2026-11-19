@@ -1076,6 +1076,9 @@ export const requestJsonSchemas = {
       "markdown": {
         "type": "boolean"
       },
+      "main_content": {
+        "type": "boolean"
+      },
       "callback_url": {
         "type": "string"
       }
@@ -1497,84 +1500,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.RedditPost]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "reddit_post"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.RedditSubreddit]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "reddit_subreddit"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
-  [Target.RedditUser]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "reddit_user"
-      },
-      "url": {
-        "type": "string",
-        "maxLength": 2056
-      },
-      "locale": {
-        "type": "string"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "sort": {
-        "type": "string"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.YoutubeMetadata]: {
     "type": "object",
     "properties": {
@@ -1749,9 +1674,6 @@ export const requestSchemas: Record<Target, z.ZodObject> = {
   [Target.TiktokShopSearch]: z.fromJSONSchema(requestJsonSchemas[Target.TiktokShopSearch] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.TiktokShopProduct]: z.fromJSONSchema(requestJsonSchemas[Target.TiktokShopProduct] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Tiktok]: z.fromJSONSchema(requestJsonSchemas[Target.Tiktok] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
-  [Target.RedditPost]: z.fromJSONSchema(requestJsonSchemas[Target.RedditPost] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
-  [Target.RedditSubreddit]: z.fromJSONSchema(requestJsonSchemas[Target.RedditSubreddit] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
-  [Target.RedditUser]: z.fromJSONSchema(requestJsonSchemas[Target.RedditUser] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.YoutubeMetadata]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeMetadata] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.YoutubeSearch]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSearch] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.YoutubeSubtitles]: z.fromJSONSchema(requestJsonSchemas[Target.YoutubeSubtitles] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,

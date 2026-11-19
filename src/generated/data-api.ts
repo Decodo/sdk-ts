@@ -128,6 +128,10 @@ export interface MapSiteResponse {
     status_code: number;
     url: string;
     sitemap_status: 'include' | 'only' | 'skip';
+    /**
+     * Present when discovery was incomplete, for example the seed page or the sitemap could not be read, child sitemaps were skipped, or the sitemap file cap was hit. Absent when every source was read in full.
+     */
+    warning?: string;
     map_id: string;
     /**
      * UTC timestamp formatted as "YYYY-MM-DD HH:MM:SS". Not RFC 3339.
