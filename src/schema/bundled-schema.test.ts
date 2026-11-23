@@ -41,4 +41,11 @@ describe('BundledSchema.shared', () => {
   it('returns empty shared parameters', () => {
     expect(schema.getSharedParameters()).toEqual({});
   });
+
+  it('bundles the flows and surfaces of the IR it was generated from', () => {
+    expect(schema.getFlow('crawl')).toMatchObject({ pattern: 'job' });
+    expect(schema.getOperation('scrapePage')).toMatchObject({ path: '/v1/scrape' });
+    expect(schema.getKeyCheck()?.flow).toBe('scrape');
+    expect(schema.getSurface('google-adk-python')?.tools.length).toBeGreaterThan(0);
+  });
 });

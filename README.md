@@ -496,6 +496,48 @@ if (firstPage.next) {
 await client.webScrapingApi.cancelCrawl(job.crawl_id);
 ```
 
+### Flows
+
+`client.webScrapingApi.flows` runs any product by the pattern the Decodo IR gives it, so an endpoint added to the IR works without a new SDK method. There are three patterns: `call` (one request), `job` (start, wait, read, cancel) and `batch` (one request that starts many jobs). Flows need `apiKey` and IR 2.6.0 or newer; load the latest IR with `RemoteSchema` and pass it to the client:
+
+```typescript
+import { DecodoClient, RemoteSchema } from '@decodo/sdk-ts';
+
+const schema = await RemoteSchema.load({ ttlMs: 3_600_000 });
+const client = new DecodoClient({ webScrapingApi: { apiKey: '<api_key>' }, schema });
+const { flows } = client.webScrapingApi;
+
+const links = await flows.call('map', { url: 'https://example.com' });
+
+const job = await flows.start('crawl', { url: 'https://example.com', limit: 10 });
+const crawlId = job[flows.describe('crawl', 'job').idField] as string;
+const status = await flows.wait('crawl', crawlId, { timeout: 120_000 });
+if (!flows.hasFailed('crawl', status)) {
+  const pages = await flows.results('crawl', crawlId);
+}
+
+await flows.checkKey(); // rejects with AuthenticationError when the key is refused
+```
+
+`wait` throws a `JobTimeoutError` when the job is still running after `timeout`.
+
+### Surfaces
+
+The IR also describes each integration's tools as a surface, keyed by the integration's `x-integration` value: tool names, descriptions, which API fields each tool shows, fixed values, defaults, caps and how to read the result. Build tools from it instead of hard-coding them:
+
+```typescript
+import { buildToolInputSchema, runTool } from '@decodo/sdk-ts';
+
+for (const tool of schema.getSurface('mcp')?.tools ?? []) {
+  const inputSchema = buildToolInputSchema(schema, tool); // JSON schema of the tool's input
+  register(tool.name, tool.description, inputSchema, (args) => runTool(client.webScrapingApi.flows, tool, args));
+}
+```
+
+`runTool` sends the tool's request (shown fields, defaults, then fixed values), applies the tool's result rule and throws a `ResultError` (with `code` and `retryable`) for a failure the rule declares. `readResult` and `buildToolRequest` are exported for clients that send requests themselves.
+
+`RemoteSchema.load({ url })` also takes a `file:` URL, read from disk on every load, for testing an IR that isn't published yet.
+
 ## Supported targets
 
 Each target accepts one primary input parameter (`url`, `query`, `product_id`, or `prompt`) together with optional configuration. The examples below show the minimum payload to call `client.webScrapingApi.scrape(...)`.

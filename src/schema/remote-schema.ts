@@ -1,13 +1,28 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { JSONSchema4 } from 'json-schema';
 import * as z from 'zod';
 import type { TargetMeta } from '../generated/targets.js';
 import { buildTargetMeta } from './build-target-meta.js';
-import { DEFAULT_IR_CACHE_PATH } from './constants.js';
+import {
+  DEFAULT_IR_BASE,
+  DEFAULT_IR_CACHE_PATH,
+  DEFAULT_IR_PREFIX,
+} from './constants.js';
 import { expandPath } from './expand-path.js';
 import { resolveLatestIr } from './resolve-latest-ir.js';
-import type { DecodoSchema, CachedIr, RemoteIr, RemoteSchemaLoadOptions } from './types.js';
+import type {
+  CachedIr,
+  FlowSchema,
+  IrFlow,
+  IrFlowSections,
+  IrKeyCheck,
+  IrOperation,
+  IrSurface,
+  RemoteIr,
+  RemoteSchemaLoadOptions,
+} from './types.js';
 
 const readCachedIr = (cachePath: string): CachedIr | null => {
   try {
@@ -25,7 +40,13 @@ const isCacheFresh = (cached: CachedIr, ttlMs?: number): boolean => {
   return Date.now() - cached.fetchedAt < ttlMs;
 };
 
+const isFileUrl = (url: string): boolean => url.startsWith('file:');
+
 const fetchIr = async (url: string): Promise<RemoteIr> => {
+  if (isFileUrl(url)) {
+    return JSON.parse(readFileSync(fileURLToPath(url), 'utf-8')) as RemoteIr;
+  }
+
   const res = await fetch(url, {
     headers: { Accept: 'application/json' },
   });
@@ -38,8 +59,12 @@ const fetchIr = async (url: string): Promise<RemoteIr> => {
 };
 
 const writeCachedIr = (cachePath: string, cached: CachedIr): void => {
-  mkdirSync(dirname(cachePath), { recursive: true });
-  writeFileSync(cachePath, JSON.stringify(cached, null, 2));
+  try {
+    mkdirSync(dirname(cachePath), { recursive: true });
+    writeFileSync(cachePath, JSON.stringify(cached, null, 2));
+  } catch {
+    return;
+  }
 };
 
 const resolveIrUrl = async (
@@ -53,19 +78,24 @@ const resolveIrUrl = async (
   return { url: latest.url, version: latest.version };
 };
 
-const loadIr = async (config: RemoteSchemaLoadOptions): Promise<RemoteIr> => {
-  const cachePath = expandPath(config.cachePath ?? DEFAULT_IR_CACHE_PATH);
-  const cached = readCachedIr(cachePath);
+const isCacheOf = (cached: CachedIr, url: string | undefined): boolean =>
+  url
+    ? cached.resolvedUrl === url
+    : cached.resolvedUrl.startsWith(`${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}`);
+
+const refreshIr = async (
+  config: RemoteSchemaLoadOptions,
+  cachePath: string,
+  cached: CachedIr | null,
+): Promise<RemoteIr> => {
   const resolved = await resolveIrUrl(config);
 
-  if (cached?.resolvedUrl === resolved.url) {
-    if (isCacheFresh(cached, config.ttlMs)) {
-      return cached.ir;
-    }
-
-    if (config.url || cached.ir.version === resolved.version) {
-      return cached.ir;
-    }
+  if (
+    cached?.resolvedUrl === resolved.url &&
+    cached.ir.version === resolved.version
+  ) {
+    writeCachedIr(cachePath, { ...cached, fetchedAt: Date.now() });
+    return cached.ir;
   }
 
   const ir = await fetchIr(resolved.url);
@@ -77,6 +107,45 @@ const loadIr = async (config: RemoteSchemaLoadOptions): Promise<RemoteIr> => {
   return ir;
 };
 
+const loadIr = async (config: RemoteSchemaLoadOptions): Promise<RemoteIr> => {
+  if (config.url && isFileUrl(config.url)) {
+    return fetchIr(config.url);
+  }
+
+  const cachePath = expandPath(config.cachePath ?? DEFAULT_IR_CACHE_PATH);
+  const cached = readCachedIr(cachePath);
+  const usable = cached && isCacheOf(cached, config.url) ? cached : null;
+
+  if (
+    usable &&
+    (config.url ||
+      (config.ttlMs !== undefined && isCacheFresh(usable, config.ttlMs)))
+  ) {
+    return usable.ir;
+  }
+
+  try {
+    return await refreshIr(config, cachePath, cached);
+  } catch (error) {
+    if (!usable) {
+      throw error;
+    }
+
+    const message = error instanceof Error ? error.message : String(error);
+    process.emitWarning(
+      `Could not refresh the Decodo IR (${message}); using the cached copy.`,
+    );
+    return usable.ir;
+  }
+};
+
+const flowSectionsOf = (ir: RemoteIr): IrFlowSections => ({
+  operations: ir.operations ?? {},
+  flows: ir.flows ?? {},
+  surfaces: ir.surfaces ?? {},
+  keyCheck: ir.keyCheck,
+});
+
 const buildRequestSchemas = (ir: RemoteIr): Map<string, z.ZodType> => {
   const schemas = new Map<string, z.ZodType>();
 
@@ -85,9 +154,7 @@ const buildRequestSchemas = (ir: RemoteIr): Map<string, z.ZodType> => {
   )) {
     schemas.set(
       targetKey,
-      z.fromJSONSchema(
-        target.parameter_schema as z.core.JSONSchema.JSONSchema,
-      ),
+      z.fromJSONSchema(target.parameter_schema as z.core.JSONSchema.JSONSchema),
     );
   }
 
@@ -106,7 +173,7 @@ const buildParameterSchemas = (ir: RemoteIr): Map<string, JSONSchema4> => {
   return schemas;
 };
 
-export class RemoteSchema implements DecodoSchema {
+export class RemoteSchema implements FlowSchema {
   readonly version: string;
 
   private readonly schemas: Map<string, z.ZodType>;
@@ -114,6 +181,7 @@ export class RemoteSchema implements DecodoSchema {
   private readonly parameterSchemas: Map<string, JSONSchema4>;
   private readonly sharedParameters: Record<string, unknown>;
   private readonly targetKeys: string[];
+  private readonly flowSections: IrFlowSections;
 
   private constructor(ir: RemoteIr, schemas: Map<string, z.ZodType>) {
     this.version = ir.version;
@@ -122,6 +190,7 @@ export class RemoteSchema implements DecodoSchema {
     this.parameterSchemas = buildParameterSchemas(ir);
     this.sharedParameters = ir.apis.webScrapingApi.parameters ?? {};
     this.targetKeys = Object.keys(ir.apis.webScrapingApi.targets);
+    this.flowSections = flowSectionsOf(ir);
   }
 
   static async load(
@@ -150,5 +219,21 @@ export class RemoteSchema implements DecodoSchema {
 
   getSharedParameters(): Record<string, unknown> {
     return this.sharedParameters;
+  }
+
+  getOperation(operation: string): IrOperation | undefined {
+    return this.flowSections.operations[operation];
+  }
+
+  getFlow(flow: string): IrFlow | undefined {
+    return this.flowSections.flows[flow];
+  }
+
+  getSurface(client: string): IrSurface | undefined {
+    return this.flowSections.surfaces[client];
+  }
+
+  getKeyCheck(): IrKeyCheck | undefined {
+    return this.flowSections.keyCheck;
   }
 }

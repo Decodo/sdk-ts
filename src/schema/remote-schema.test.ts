@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   DEFAULT_IR_BASE,
@@ -155,6 +156,62 @@ describe('RemoteSchema.load', () => {
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(schema.version).toBe('9.9.9');
+    });
+  });
+
+  it('reads a file: URL straight from disk, without the cache', async () => {
+    const fetchMock = mockFetch(() => jsonResponse({}));
+    const url = pathToFileURL(fileURLToPath(new URL('./__fixtures__/flows-ir.json', import.meta.url))).href;
+
+    await withTempCacheDir(async (cachePath) => {
+      const schema = await RemoteSchema.load({ url, cachePath });
+
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(existsSync(cachePath)).toBe(false);
+      expect(schema.getFlow('crawl')).toMatchObject({ pattern: 'job', idField: 'crawl_id' });
+      expect(schema.getOperation('runSearch')).toMatchObject({ method: 'POST', path: '/v1/search' });
+      expect(schema.getSurface('mcp')?.tools.map((tool) => tool.name)).toContain('crawl_status');
+      expect(schema.getKeyCheck()?.flow).toBe('scrape');
+    });
+  });
+
+  it('has no flows, surfaces or key check for an IR older than 2.6.0', async () => {
+    mockFetch(() => jsonResponse(minimalIr));
+
+    await withTempCacheDir(async (cachePath) => {
+      const schema = await RemoteSchema.load({ url: IR_URL, cachePath });
+
+      expect(schema.getFlow('crawl')).toBeUndefined();
+      expect(schema.getSurface('mcp')).toBeUndefined();
+      expect(schema.getKeyCheck()).toBeUndefined();
+    });
+  });
+
+  it('falls back to the cached IR, with a warning, when the refresh fails', async () => {
+    const latestUrl = `${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}1.0.0.json`;
+    mockFetch(() => {
+      throw new TypeError('fetch failed');
+    });
+    const warn = vi.spyOn(process, 'emitWarning').mockImplementation(() => undefined);
+
+    await withTempCacheDir(async (cachePath) => {
+      writeCachedIr(cachePath, { fetchedAt: 0, resolvedUrl: latestUrl, ir: minimalIr });
+
+      const schema = await RemoteSchema.load({ cachePath, ttlMs: 1_000 });
+
+      expect(schema.version).toBe('1.0.0');
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('using the cached copy'));
+    });
+  });
+
+  it('still loads when the cache cannot be written', async () => {
+    mockFetch(() => jsonResponse(minimalIr));
+
+    await withTempCacheDir(async (cachePath) => {
+      writeCachedIr(cachePath, { fetchedAt: 0, resolvedUrl: 'other', ir: minimalIr });
+      const schema = await RemoteSchema.load({ url: IR_URL, cachePath: `${cachePath}/nested/decodo.ir.json` });
+
+      expect(schema.version).toBe('1.0.0');
     });
   });
 });
