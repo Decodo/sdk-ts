@@ -4,10 +4,19 @@ import {
   requestSchemas,
 } from '../generated/request-schemas.js';
 import { targetMeta, Target, targets } from '../generated/targets.js';
-import type { DecodoSchema } from './types.js';
+import { flowSections, flowSectionsVersion } from '../generated/flows.js';
+import type {
+  FlowSchema,
+  IrFlow,
+  IrKeyCheck,
+  IrOperation,
+  IrSurface,
+} from './types.js';
 
-export class BundledSchema implements DecodoSchema {
+export class BundledSchema implements FlowSchema {
   static readonly shared = new BundledSchema();
+
+  readonly version = flowSectionsVersion;
 
   getRequestSchema(target: string) {
     return requestSchemas[target as Target];
@@ -27,5 +36,21 @@ export class BundledSchema implements DecodoSchema {
 
   getSharedParameters(): Record<string, unknown> {
     return {};
+  }
+
+  getOperation(operation: string): IrOperation | undefined {
+    return flowSections.operations[operation];
+  }
+
+  getFlow(flow: string): IrFlow | undefined {
+    return flowSections.flows[flow];
+  }
+
+  getSurface(client: string): IrSurface | undefined {
+    return flowSections.surfaces[client];
+  }
+
+  getKeyCheck(): IrKeyCheck | undefined {
+    return flowSections.keyCheck;
   }
 }

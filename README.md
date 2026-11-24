@@ -496,6 +496,58 @@ if (firstPage.next) {
 await client.webScrapingApi.cancelCrawl(job.crawl_id);
 ```
 
+### Flows
+
+`client.webScrapingApi.flows` runs any product by the pattern the Decodo IR gives it, so an endpoint added to the IR works without a new SDK method. There are three patterns: `call` (one request), `job` (start, wait, read, cancel) and `batch` (one request that starts many jobs). Flows need `apiKey` and IR 2.6.0 or newer; load the latest IR with `RemoteSchema` and pass it to the client:
+
+```typescript
+import { DecodoClient, RemoteSchema } from '@decodo/sdk-ts';
+
+const schema = await RemoteSchema.load({ ttlMs: 3_600_000 });
+const client = new DecodoClient({ webScrapingApi: { apiKey: '<api_key>' }, schema });
+const { flows } = client.webScrapingApi;
+
+const links = await flows.call('map', { url: 'https://example.com' });
+
+const job = await flows.start('crawl', { url: 'https://example.com', limit: 10 });
+const crawlId = job[flows.describe('crawl', 'job').idField] as string;
+const status = await flows.wait('crawl', crawlId, { timeout: 120_000 });
+if (!flows.hasFailed('crawl', status)) {
+  const pages = await flows.results('crawl', crawlId);
+}
+
+await flows.checkKey(); // rejects with AuthenticationError when the key is refused
+```
+
+`wait` throws a `JobTimeoutError` when the job is still running after `timeout`.
+
+`results` reads every page of a job. To read a few at a time, use `resultsPage`, which returns up to `maxItems` results (one API page when left out) and a `nextCursor` to pass back for the rest:
+
+```typescript
+const { items, nextCursor } = await flows.resultsPage('crawl', crawlId, { maxItems: 10 });
+```
+
+### Surfaces
+
+The IR also describes each integration's tools as a surface, keyed by the integration's `x-integration` value: tool names, descriptions, which API fields each tool shows, fixed values, defaults, caps and how to read the result. Build tools from it instead of hard-coding them:
+
+```typescript
+import { buildToolInputSchema, runTool } from '@decodo/sdk-ts';
+
+for (const tool of schema.getSurface('mcp')?.tools ?? []) {
+  const inputSchema = buildToolInputSchema(schema, tool); // JSON schema of the tool's input
+  register(tool.name, tool.description, inputSchema, (args) => runTool(client.webScrapingApi.flows, tool, args));
+}
+```
+
+`runTool` sends the tool's request (shown fields, defaults, then fixed values), applies the tool's result rule and throws a `ResultError` (with `code` and `retryable`) for a failure the rule declares. `readResult` and `buildToolRequest` are exported for clients that send requests themselves.
+
+A `results` tool of a paged job takes an optional `cursor` and returns `{ items, nextCursor?, status? }`: `nextCursor` reads on, and `status` appears when the job was cancelled or faulted but kept the pages it finished. A failed job with no pages throws a `ResultError`.
+
+`runTool` returns the result in full. To cap what a model sees by the tool's `limits` (`maxTextChars` per string, `maxListValues` per list, `maxItems` for the result's items and `maxResultChars` for the whole text), pass the result, or your own transformation of it, through `limitResult(tool.limits, value)`, which returns `{ text, truncated }`.
+
+`RemoteSchema.load({ url })` also takes a `file:` URL, read from disk on every load, for testing an IR that isn't published yet.
+
 ## Supported targets
 
 Each target accepts one primary input parameter (`url`, `query`, `product_id`, or `prompt`) together with optional configuration. The examples below show the minimum payload to call `client.webScrapingApi.scrape(...)`.

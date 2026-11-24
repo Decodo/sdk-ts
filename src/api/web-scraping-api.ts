@@ -2,6 +2,7 @@ import { prettifyError } from 'zod';
 import { HttpClient } from '../http.js';
 import { TimeoutError, ValidationError } from '../errors.js';
 import { BundledSchema } from '../schema/bundled-schema.js';
+import { Flows } from './flows.js';
 import type { DecodoSchema } from '../schema/types.js';
 import { dataApiEndpoints } from '../generated/data-api.js';
 import type {
@@ -70,6 +71,7 @@ const nextCursor = (next: string | undefined): string | undefined => {
 };
 
 export class WebScrapingApi {
+  readonly flows: Flows;
   private readonly http: HttpClient;
   private readonly schemas: DecodoSchema;
   private readonly routes: WebScrapingApiRoutes;
@@ -82,6 +84,7 @@ export class WebScrapingApi {
     this.http = http;
     this.schemas = schemas;
     this.routes = routes;
+    this.flows = new Flows(http, schemas, { available: Boolean(routes.dataApi) });
   }
 
   private validate(params: ScrapeRequest): void {

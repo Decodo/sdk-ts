@@ -40,3 +40,27 @@ export class TimeoutError extends Error {
     this.name = 'TimeoutError';
   }
 }
+
+export class ResultError extends Error {
+  public readonly code: string;
+  public readonly retryable: boolean;
+
+  constructor(message: string, code: string, retryable = false) {
+    super(message);
+    this.name = 'ResultError';
+    this.code = code;
+    this.retryable = retryable;
+  }
+}
+
+export class JobTimeoutError extends TimeoutError {
+  public readonly flow: string;
+  public readonly jobId: string;
+
+  constructor(flow: string, jobId: string, timeoutMs: number) {
+    super(`The ${flow} job ${jobId} was still running after ${timeoutMs}ms.`);
+    this.name = 'JobTimeoutError';
+    this.flow = flow;
+    this.jobId = jobId;
+  }
+}

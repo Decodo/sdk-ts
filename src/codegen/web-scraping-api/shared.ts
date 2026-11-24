@@ -68,21 +68,39 @@ export const stripTargetProperty = (schema: JSONSchema4): JSONSchema4 => {
   return result;
 };
 
+const readIrText = async (url: string): Promise<string> => {
+  if (url.startsWith('file:')) {
+    return readFileSync(fileURLToPath(url), 'utf-8');
+  }
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.text();
+};
+
 export const fetchIntermediateRepresentation = async (): Promise<IR> => {
+  const override = process.env.DECODO_IR_URL;
+  if (override) {
+    return JSON.parse(await readIrText(override)) as IR;
+  }
+
   try {
     const { url } = await resolveLatestIr();
-    const res = await fetch(url);
-    if (!res.ok) { throw new Error(`HTTP ${res.status}`); }
-    const json = await res.text();
+    const json = await readIrText(url);
     mkdirSync(dirname(localIrPath), { recursive: true });
     writeFileSync(localIrPath, json, 'utf-8');
     return JSON.parse(json) as IR;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     if (existsSync(localIrPath)) {
-      console.warn(`Warning: failed to fetch IR (${message}). Using cached local file.`);
+      console.warn(
+        `Warning: failed to fetch IR (${message}). Using cached local file.`,
+      );
       return JSON.parse(readFileSync(localIrPath, 'utf-8')) as IR;
     }
-    throw new Error(`Failed to fetch IR (${message}) and no local cache found at ${localIrPath}.`);
+    throw new Error(
+      `Failed to fetch IR (${message}) and no local cache found at ${localIrPath}.`,
+    );
   }
 };
