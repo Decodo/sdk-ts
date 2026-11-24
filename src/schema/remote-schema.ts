@@ -5,11 +5,7 @@ import type { JSONSchema4 } from 'json-schema';
 import * as z from 'zod';
 import type { TargetMeta } from '../generated/targets.js';
 import { buildTargetMeta } from './build-target-meta.js';
-import {
-  DEFAULT_IR_BASE,
-  DEFAULT_IR_CACHE_PATH,
-  DEFAULT_IR_PREFIX,
-} from './constants.js';
+import { DEFAULT_IR_CACHE_PATH } from './constants.js';
 import { expandPath } from './expand-path.js';
 import { resolveLatestIr } from './resolve-latest-ir.js';
 import type {
@@ -24,10 +20,20 @@ import type {
   RemoteSchemaLoadOptions,
 } from './types.js';
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isCachedIr = (value: unknown): value is CachedIr =>
+  isRecord(value) &&
+  typeof value.fetchedAt === 'number' &&
+  typeof value.resolvedUrl === 'string' &&
+  isRecord(value.ir) &&
+  typeof value.ir.version === 'string';
+
 const readCachedIr = (cachePath: string): CachedIr | null => {
   try {
-    const raw = readFileSync(cachePath, 'utf-8');
-    return JSON.parse(raw) as CachedIr;
+    const parsed: unknown = JSON.parse(readFileSync(cachePath, 'utf-8'));
+    return isCachedIr(parsed) ? parsed : null;
   } catch {
     return null;
   }
@@ -79,9 +85,7 @@ const resolveIrUrl = async (
 };
 
 const isCacheOf = (cached: CachedIr, url: string | undefined): boolean =>
-  url
-    ? cached.resolvedUrl === url
-    : cached.resolvedUrl.startsWith(`${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}`);
+  url ? cached.resolvedUrl === url : cached.latest === true;
 
 const refreshIr = async (
   config: RemoteSchemaLoadOptions,
@@ -94,7 +98,11 @@ const refreshIr = async (
     cached?.resolvedUrl === resolved.url &&
     cached.ir.version === resolved.version
   ) {
-    writeCachedIr(cachePath, { ...cached, fetchedAt: Date.now() });
+    writeCachedIr(cachePath, {
+      ...cached,
+      fetchedAt: Date.now(),
+      latest: !config.url,
+    });
     return cached.ir;
   }
 
@@ -102,6 +110,7 @@ const refreshIr = async (
   writeCachedIr(cachePath, {
     fetchedAt: Date.now(),
     resolvedUrl: resolved.url,
+    latest: !config.url,
     ir,
   });
   return ir;

@@ -123,6 +123,7 @@ export type RemoteIr = {
 export type CachedIr = {
   fetchedAt: number;
   resolvedUrl: string;
+  latest?: boolean;
   ir: RemoteIr;
 };
 

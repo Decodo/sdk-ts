@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -195,12 +195,51 @@ describe('RemoteSchema.load', () => {
     const warn = vi.spyOn(process, 'emitWarning').mockImplementation(() => undefined);
 
     await withTempCacheDir(async (cachePath) => {
-      writeCachedIr(cachePath, { fetchedAt: 0, resolvedUrl: latestUrl, ir: minimalIr });
+      writeCachedIr(cachePath, { fetchedAt: 0, resolvedUrl: latestUrl, latest: true, ir: minimalIr });
 
       const schema = await RemoteSchema.load({ cachePath, ttlMs: 1_000 });
 
       expect(schema.version).toBe('1.0.0');
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('using the cached copy'));
+    });
+  });
+
+  it('ignores a cache written by another SDK and replaces it', async () => {
+    const latestUrl = `${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}2.1.0.json`;
+    mockFetch((input) =>
+      String(input) === DEFAULT_IR_LIST_URL
+        ? jsonResponse({ items: [{ name: `${DEFAULT_IR_PREFIX}2.1.0.json` }] })
+        : jsonResponse(cloneIr('2.1.0')),
+    );
+
+    await withTempCacheDir(async (cachePath) => {
+      writeFileSync(
+        cachePath,
+        JSON.stringify({ fetched_at: Date.now(), resolved_url: latestUrl, ir: cloneIr('2.0.0') }),
+      );
+
+      const schema = await RemoteSchema.load({ cachePath, ttlMs: 60_000 });
+
+      expect(schema.version).toBe('2.1.0');
+      expect(JSON.parse(readFileSync(cachePath, 'utf-8'))).toMatchObject({ resolvedUrl: latestUrl, latest: true });
+    });
+  });
+
+  it('does not serve a version pinned through url as the latest', async () => {
+    const pinnedUrl = `${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}2.0.0.json`;
+    const latestUrl = `${DEFAULT_IR_BASE}/${DEFAULT_IR_PREFIX}2.1.0.json`;
+    mockFetch((input) => {
+      if (String(input) === DEFAULT_IR_LIST_URL) {
+        return jsonResponse({ items: [{ name: `${DEFAULT_IR_PREFIX}2.1.0.json` }] });
+      }
+      return jsonResponse(String(input) === latestUrl ? cloneIr('2.1.0') : cloneIr('2.0.0'));
+    });
+
+    await withTempCacheDir(async (cachePath) => {
+      await RemoteSchema.load({ url: pinnedUrl, cachePath });
+      const schema = await RemoteSchema.load({ cachePath, ttlMs: 60_000 });
+
+      expect(schema.version).toBe('2.1.0');
     });
   });
 

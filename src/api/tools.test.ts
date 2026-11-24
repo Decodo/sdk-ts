@@ -106,7 +106,7 @@ describe('runTool', () => {
       crawl_id: 'c1',
     });
     await expect(runTool(flows(), tool('mcp', 'crawl_status'), { crawl_id: 'c1' })).resolves.toEqual({ status: 'done' });
-    await expect(runTool(flows(), tool('mcp', 'crawl_results'), { crawl_id: 'c1' })).resolves.toEqual([{ url: 'a' }]);
+    await expect(runTool(flows(), tool('mcp', 'crawl_results'), { crawl_id: 'c1' })).resolves.toEqual({ items: [{ url: 'a' }] });
     await expect(runTool(flows(), tool('mcp', 'crawl_cancel'), { crawl_id: 'c1' })).resolves.toEqual({
       status: 'cancelled',
     });
@@ -122,6 +122,57 @@ describe('runTool', () => {
 
     await expect(running).resolves.toEqual({ status: 'pending' });
     vi.useRealTimers();
+  });
+
+  it('reads one page of results at a time and resumes from the cursor it returns', async () => {
+    mockFetch((input) =>
+      String(input).includes('page=2')
+        ? jsonResponse({ url: [{ url: 'b' }] })
+        : jsonResponse({ url: [{ url: 'a' }], next: 'https://data.decodo.com/v1/crawl/c1?type=content&page=2' }),
+    );
+
+    const first = (await runTool(flows(), tool('mcp', 'crawl_results'), { crawl_id: 'c1' })) as {
+      items: unknown[];
+      nextCursor: string;
+    };
+    expect(first.items).toEqual([{ url: 'a' }]);
+
+    await expect(
+      runTool(flows(), tool('mcp', 'crawl_results'), { crawl_id: 'c1', cursor: first.nextCursor }),
+    ).resolves.toEqual({ items: [{ url: 'b' }] });
+  });
+
+  it('offers a cursor input only on paged results', () => {
+    expect(buildToolInputSchema(schema, tool('mcp', 'crawl_results')).properties).toHaveProperty('cursor');
+    expect(buildToolInputSchema(schema, tool('mcp', 'crawl_status')).properties).not.toHaveProperty('cursor');
+  });
+
+  it('keeps the pages a failed job finished, saying how it ended', async () => {
+    mockFetch((input) =>
+      String(input).includes('type=content')
+        ? jsonResponse({ url: [{ url: 'a', status: 'done', content: 'x' }] })
+        : jsonResponse({ status: 'cancelled' }),
+    );
+
+    await expect(
+      runTool(flows(), tool('google-adk-python', 'decodo_crawl_results'), { crawl_id: 'c1' }),
+    ).resolves.toMatchObject({ status: 'cancelled', items: [{ url: 'a' }] });
+  });
+
+  it('raises a failed job that finished no pages', async () => {
+    mockFetch((input) =>
+      String(input).includes('type=content') ? jsonResponse({ url: [] }) : jsonResponse({ status: 'faulted' }),
+    );
+
+    await expect(
+      runTool(flows(), tool('google-adk-python', 'decodo_crawl_results'), { crawl_id: 'c1' }),
+    ).rejects.toThrow('ended with status "faulted"');
+  });
+
+  it('refuses a job-flow tool that names no step', () => {
+    const stepless = { ...tool('mcp', 'crawl_start'), step: undefined };
+
+    expect(() => buildToolInputSchema(schema, stepless)).toThrow('names no step');
   });
 
   it('needs the job id', async () => {

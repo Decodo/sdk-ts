@@ -36,6 +36,23 @@ export type JobResultsOptions = {
   maxItems?: number;
 };
 
+export type JobResultsPageOptions = {
+  cursor?: string;
+  maxItems?: number;
+};
+
+export type JobResultsPage = {
+  items: unknown[];
+  nextCursor?: string;
+};
+
+type PagePosition = {
+  page?: string;
+  skip: number;
+};
+
+const FLOWS_SINCE: [number, number, number] = [2, 6, 0];
+
 type JobStatus = Record<string, unknown>;
 
 const sleep = (ms: number): Promise<void> =>
@@ -55,15 +72,58 @@ const localPath = (path: unknown): string => {
   return path;
 };
 
+const isOlderThanFlows = (version: string | undefined): boolean => {
+  const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(version ?? '');
+  if (!match) {
+    return false;
+  }
+  for (let i = 0; i < 3; i += 1) {
+    const part = Number(match[i + 1]);
+    if (part !== FLOWS_SINCE[i]) {
+      return part < FLOWS_SINCE[i];
+    }
+  }
+  return false;
+};
+
 const isFlowSchema = (schema: DecodoSchema): schema is FlowSchema =>
   typeof (schema as Partial<FlowSchema>).getFlow === 'function' &&
-  typeof (schema as Partial<FlowSchema>).getOperation === 'function';
+  typeof (schema as Partial<FlowSchema>).getOperation === 'function' &&
+  !isOlderThanFlows(schema.version);
+
+const INVALID_CURSOR =
+  'Invalid cursor: pass the nextCursor from the previous results call.';
+
+const encodeCursor = (position: PagePosition): string =>
+  Buffer.from(JSON.stringify(position)).toString('base64url');
+
+const decodeCursor = (cursor: string, jobId: string): PagePosition => {
+  let position: unknown;
+  try {
+    position = JSON.parse(Buffer.from(cursor, 'base64url').toString());
+  } catch {
+    throw new Error(INVALID_CURSOR);
+  }
+  const { page, skip } = (position ?? {}) as Partial<PagePosition>;
+  if (
+    !Number.isInteger(skip) ||
+    (skip as number) < 0 ||
+    (page !== undefined &&
+      (typeof page !== 'string' || !page.includes(encodeURIComponent(jobId))))
+  ) {
+    throw new Error(INVALID_CURSOR);
+  }
+  return {
+    page: page === undefined ? undefined : localPath(page),
+    skip: skip as number,
+  };
+};
 
 export class Flows {
   private readonly http: HttpClient;
   private readonly schema: DecodoSchema;
   private readonly available: boolean;
-  private readonly validators = new Map<string, z.ZodType | null>();
+  private readonly validators = new Map<string, z.ZodType>();
 
   constructor(
     http: HttpClient,
@@ -114,6 +174,8 @@ export class Flows {
         'The schema in use has no key check; it needs Decodo IR 2.6.0 or newer.',
       );
     }
+    const run = this.describe(check.flow, 'call').run;
+    this.validate(run, this.operation(run), check.params);
     try {
       await this.call(check.flow, check.params);
     } catch (err) {
@@ -237,6 +299,74 @@ export class Flows {
     return maxItems === undefined ? items : items.slice(0, maxItems);
   }
 
+  async resultsPage(
+    flow: string,
+    jobId: string,
+    { cursor, maxItems }: JobResultsPageOptions = {},
+  ): Promise<JobResultsPage> {
+    const described = this.describe(flow, 'job');
+    const { pagination } = described;
+    if (!pagination) {
+      throw new Error(`Flow "${flow}" returns its results in one response.`);
+    }
+    if (
+      maxItems !== undefined &&
+      !(Number.isInteger(maxItems) && maxItems > 0)
+    ) {
+      throw new Error('maxItems must be a whole number above 0.');
+    }
+
+    const itemsOf = (page: JobStatus | undefined): unknown[] => {
+      const found = page?.[pagination.itemsField];
+      return Array.isArray(found) ? found : [];
+    };
+    const nextPageOf = (page: JobStatus | undefined): string | undefined => {
+      const next = page?.[pagination.nextUrlField];
+      if (typeof next !== 'string' || !next) {
+        return undefined;
+      }
+      const url = new URL(next);
+      return `${localPath(url.pathname)}${url.search}`;
+    };
+
+    let position = cursor ? decodeCursor(cursor, jobId) : { skip: 0 };
+    const items: unknown[] = [];
+
+    for (;;) {
+      const body = (
+        position.page === undefined
+          ? await this.send(described.results, {
+              jobId,
+              query: described.resultsQuery,
+            })
+          : await this.http.get<JobStatus>(position.page)
+      ) as JobStatus | undefined;
+      const pageItems = itemsOf(body).slice(position.skip);
+      const room =
+        maxItems === undefined ? pageItems.length : maxItems - items.length;
+      items.push(...pageItems.slice(0, room));
+
+      if (room < pageItems.length) {
+        return {
+          items,
+          nextCursor: encodeCursor({
+            page: position.page,
+            skip: position.skip + room,
+          }),
+        };
+      }
+
+      const next = nextPageOf(body);
+      if (!next) {
+        return { items };
+      }
+      position = { page: next, skip: 0 };
+      if (maxItems === undefined || items.length >= maxItems) {
+        return { items, nextCursor: encodeCursor(position) };
+      }
+    }
+  }
+
   async cancel(flow: string, jobId: string): Promise<JobStatus> {
     const endpoint = this.describe(flow, 'job').cancel;
     if (!endpoint) {
@@ -324,16 +454,19 @@ export class Flows {
       return undefined;
     }
     if (!this.validators.has(name)) {
-      this.validators.set(name, toZod(ownSchema));
+      this.validators.set(name, toZod(name, ownSchema));
     }
-    return this.validators.get(name) ?? undefined;
+    return this.validators.get(name);
   }
 }
 
-const toZod = (schema: JSONSchema4): z.ZodType | null => {
+const toZod = (name: string, schema: JSONSchema4): z.ZodType => {
   try {
     return z.fromJSONSchema(schema as z.core.JSONSchema.JSONSchema);
-  } catch {
-    return null;
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `The schema's request schema for operation "${name}" is not valid JSON Schema: ${reason}`,
+    );
   }
 };

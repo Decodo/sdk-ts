@@ -1,5 +1,5 @@
 import type { JSONSchema4 } from 'json-schema';
-import { JobTimeoutError } from '../errors.js';
+import { JobTimeoutError, ResultError } from '../errors.js';
 import type { FlowSchema, IrFlow, IrSurfaceTool } from '../schema/types.js';
 import type { Flows } from './flows.js';
 import { readResult } from './results.js';
@@ -7,11 +7,18 @@ import { readResult } from './results.js';
 const isIdStep = (tool: IrSurfaceTool): boolean =>
   tool.step === 'status' || tool.step === 'results' || tool.step === 'cancel';
 
+const CURSOR = 'cursor';
+
 const flowOf = (schema: FlowSchema, tool: IrSurfaceTool): IrFlow => {
   const flow = schema.getFlow(tool.flow);
   if (!flow) {
     throw new Error(
       `Tool "${tool.name}" names flow "${tool.flow}", which the schema lacks.`,
+    );
+  }
+  if (flow.pattern === 'job' && !tool.step) {
+    throw new Error(
+      `Tool "${tool.name}" runs job flow "${tool.flow}" but names no step.`,
     );
   }
   return flow;
@@ -82,6 +89,7 @@ export const buildToolInputSchema = (
         `Tool "${tool.name}" has step "${tool.step}", which only job flows have.`,
       );
     }
+    const paged = tool.step === 'results' && flow.pagination;
     return {
       type: 'object',
       properties: {
@@ -91,6 +99,13 @@ export const buildToolInputSchema = (
             description: tool.descriptions[flow.idField],
           }),
         },
+        ...(paged && {
+          [CURSOR]: {
+            type: 'string',
+            description:
+              'nextCursor from the previous call; leave it out for the first results',
+          },
+        }),
       },
       required: [flow.idField],
       additionalProperties: false,
@@ -161,6 +176,66 @@ const jobIdOf = (
   return id;
 };
 
+const runResults = async (
+  flows: Flows,
+  tool: IrSurfaceTool,
+  flow: IrFlow,
+  args: Record<string, unknown>,
+): Promise<unknown> => {
+  const jobId = jobIdOf(flow, tool, args);
+  const waitSeconds = tool.limits?.waitSeconds;
+  let failedStatus: string | undefined;
+
+  if (waitSeconds) {
+    let status: Record<string, unknown>;
+    try {
+      status = await flows.wait(tool.flow, jobId, {
+        timeout: waitSeconds * 1000,
+      });
+    } catch (err) {
+      if (err instanceof JobTimeoutError) {
+        return flows.status(tool.flow, jobId);
+      }
+      throw err;
+    }
+    if (flows.hasFailed(tool.flow, status) && flow.pattern === 'job') {
+      failedStatus = String(status[flow.statusField]);
+    }
+  }
+
+  const failed = (): ResultError =>
+    new ResultError(
+      `The ${tool.flow} job ${jobId} ended with status "${failedStatus}".`,
+      failedStatus ?? 'failed',
+    );
+
+  if (flow.pattern !== 'job' || !flow.pagination) {
+    if (failedStatus) {
+      throw failed();
+    }
+    return readResult(
+      tool.result,
+      await flows.results(tool.flow, jobId, { maxItems: tool.limits?.maxItems }),
+    );
+  }
+
+  const cursor = args[CURSOR];
+  const page = await flows.resultsPage(tool.flow, jobId, {
+    cursor: typeof cursor === 'string' && cursor ? cursor : undefined,
+    maxItems: tool.limits?.maxItems,
+  });
+  // A cancelled or faulted job keeps the pages it finished; only a job with none is an error.
+  if (failedStatus && page.items.length === 0 && !cursor) {
+    throw failed();
+  }
+
+  return {
+    items: readResult(tool.result, page.items),
+    ...(page.nextCursor && { nextCursor: page.nextCursor }),
+    ...(failedStatus && { status: failedStatus }),
+  };
+};
+
 export const runTool = async (
   flows: Flows,
   tool: IrSurfaceTool,
@@ -173,24 +248,8 @@ export const runTool = async (
       return flows.status(tool.flow, jobIdOf(flow, tool, args));
     case 'cancel':
       return flows.cancel(tool.flow, jobIdOf(flow, tool, args));
-    case 'results': {
-      const jobId = jobIdOf(flow, tool, args);
-      const waitSeconds = tool.limits?.waitSeconds;
-      if (waitSeconds) {
-        try {
-          await flows.wait(tool.flow, jobId, { timeout: waitSeconds * 1000 });
-        } catch (err) {
-          if (err instanceof JobTimeoutError) {
-            return flows.status(tool.flow, jobId);
-          }
-          throw err;
-        }
-      }
-      const items = await flows.results(tool.flow, jobId, {
-        maxItems: tool.limits?.maxItems,
-      });
-      return readResult(tool.result, items);
-    }
+    case 'results':
+      return runResults(flows, tool, flow, args);
     case 'start':
       return flows.start(tool.flow, buildToolRequest(tool, args));
     default:

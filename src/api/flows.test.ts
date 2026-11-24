@@ -148,6 +148,36 @@ describe('Flows', () => {
     expect(calls[0].body).toEqual({ target: 'universal', url: 'https://does-not-exist.decodo.com' });
   });
 
+  it('does not accept a key when the probe never reaches the API', async () => {
+    const calls = recordFetch(() => jsonResponse({}));
+    const probe = schema.getKeyCheck();
+    vi.spyOn(schema, 'getKeyCheck').mockReturnValue({ flow: 'search', params: { ...probe?.params, query: 1 } });
+
+    await expect(flowsWith().checkKey()).rejects.toBeInstanceOf(ValidationError);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('pages results by maxItems and resumes mid-page from the cursor', async () => {
+    const calls = recordFetch((call) =>
+      call.url.includes('cursor=2')
+        ? jsonResponse({ url: [{ url: 'c' }] })
+        : jsonResponse({ url: [{ url: 'a' }, { url: 'b' }], next: 'https://data.decodo.com/v1/crawl/c1?type=content&cursor=2' }),
+    );
+
+    const first = await flowsWith().resultsPage('crawl', 'c1', { maxItems: 1 });
+    expect(first.items).toEqual([{ url: 'a' }]);
+    const second = await flowsWith().resultsPage('crawl', 'c1', { cursor: first.nextCursor, maxItems: 5 });
+    expect(second).toEqual({ items: [{ url: 'b' }, { url: 'c' }] });
+    expect(calls).toHaveLength(3);
+  });
+
+  it('refuses a cursor from another job', async () => {
+    recordFetch(() => jsonResponse({ url: [{ url: 'a' }], next: 'https://data.decodo.com/v1/crawl/c1?type=content&cursor=2' }));
+
+    const { nextCursor } = await flowsWith().resultsPage('crawl', 'c1');
+    await expect(flowsWith().resultsPage('crawl', 'c2', { cursor: nextCursor })).rejects.toThrow('Invalid cursor');
+  });
+
   it('rejects a key the API refuses', async () => {
     recordFetch(() => jsonResponse({ message: 'Unauthorized' }, 401));
 
@@ -171,6 +201,12 @@ describe('Flows', () => {
       getTargetParameterSchema: () => undefined,
       getSharedParameters: () => ({}),
     };
+
+    expect(() => flowsWith({ apiKey: 'key' }, older).describe('search')).toThrow('IR 2.6.0 or newer');
+  });
+
+  it('names the IR version when a loaded IR is older than flows', () => {
+    const older = Object.assign(Object.create(schema) as RemoteSchema, { version: '2.5.0' });
 
     expect(() => flowsWith({ apiKey: 'key' }, older).describe('search')).toThrow('IR 2.6.0 or newer');
   });
