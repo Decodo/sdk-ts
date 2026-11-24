@@ -2,7 +2,7 @@
 
 import type { IrFlowSections } from '../schema/types.js';
 
-export const flowSectionsVersion = "2.6.0";
+export const flowSectionsVersion = "2.7.0";
 
 export const flowSections: IrFlowSections = {
   "operations": {
@@ -846,6 +846,3782 @@ export const flowSections: IrFlowSections = {
           "step": "cancel",
           "descriptions": {
             "crawl_id": "The crawl_id returned when the crawl was started."
+          }
+        }
+      ]
+    },
+    "mcp": {
+      "tools": [
+        {
+          "name": "scrape_as_markdown",
+          "title": "Scrape as Markdown",
+          "description": "Fetch any public web page through the Decodo Web Data API (`universal` target) and return its content as Markdown. Use it to read a specific URL when no site-specific tool fits; very long pages are truncated, and `tokenLimit` sets a lower cap. Docs: https://help.decodo.com/docs/web-data-api-markdown-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal"
+          },
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "url": "URL to scrape",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          },
+          "limits": {
+            "maxTextChars": 45000
+          }
+        },
+        {
+          "name": "screenshot",
+          "title": "Screenshot",
+          "description": "Capture a PNG screenshot of a web page through the Decodo Web Data API (`universal` target with PNG output). Use it when the page layout or visuals matter, not just its text. Docs: https://help.decodo.com/docs/web-data-api-screenshot-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal",
+            "headless": "png"
+          },
+          "descriptions": {
+            "url": "URL to screenshot",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "map",
+          "title": "Map Website",
+          "description": "List the URLs on a website without fetching their content. Large sites can overflow your context, so `limit` defaults to 10; narrow with select_paths or exclude_paths. For precise work, map the site, then scrape_as_markdown only the pages you need.",
+          "group": "web",
+          "flow": "map",
+          "fields": [
+            "url",
+            "limit",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 500
+          },
+          "descriptions": {
+            "url": "Website URL to map",
+            "limit": "Maximum number of URLs to return, 10 by default and at most 500",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_start",
+          "title": "Start Crawl",
+          "description": "Start crawling a website and return the crawl id right away, without waiting for it to finish. Check progress with crawl_status, read pages with crawl_results and stop it early with crawl_cancel. Crawled content can overflow your context, so `limit` defaults to 10 pages. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "start",
+          "fields": [
+            "url",
+            "limit",
+            "max_depth",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "output": "markdown"
+          },
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 100
+          },
+          "descriptions": {
+            "url": "Website URL to start crawling from",
+            "limit": "Maximum number of pages to crawl, 10 by default and at most 100",
+            "max_depth": "How many links deep to follow from the start URL",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_status",
+          "title": "Crawl Status",
+          "description": "Report the progress of a crawl started with crawl_start: its status and how many pages were discovered, completed and failed. The crawl is finished once status is no longer \"pending\".",
+          "group": "web",
+          "flow": "crawl",
+          "step": "status",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "crawl_results",
+          "title": "Crawl Results",
+          "description": "Return crawled pages as Markdown from a crawl started with crawl_start, a few at a time. Call it once crawl_status reports the crawl is no longer \"pending\". Crawled pages can be long and overflow your context, so each call returns at most about 50 KB and up to `limit` pages (10 by default). A page too long for one call is split across calls; each part carries contentPart with its character range. Pass nextCursor back to get the rest; when it is missing, you have every page. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "results",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          },
+          "limits": {
+            "maxResultChars": 49000
+          }
+        },
+        {
+          "name": "crawl_cancel",
+          "title": "Cancel Crawl",
+          "description": "Stop a crawl started with crawl_start so it crawls no more pages. Pages crawled before the cancel stay readable with crawl_results.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "cancel",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "search",
+          "title": "Web Search",
+          "description": "Search the web and return ranked results with title, link and description. Results can overflow your context, so `limit` defaults to 10. To read a result, pass its link to scrape_as_markdown.",
+          "group": "search",
+          "flow": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "page"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "page": "Results page to return, 1 by default"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "google_search",
+          "title": "Google Search",
+          "description": "Search Google through the Decodo Web Data API (`google_search` target) and return the parsed results page as JSON, including organic results. Use it for fresh web results or Google rankings for a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-search",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "flow": "scrape",
+          "target": "google_search",
+          "fixed": {
+            "target": "google_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_ads",
+          "title": "Google Ads",
+          "description": "Search Google through the Decodo Web Data API (`google_ads` target) and return the paid Google Ads shown for a query, parsed as JSON. Use it to see which advertisers bid on a keyword and what their ads say. Docs: https://help.decodo.com/docs/web-scraping-api-google-ads",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Google Ads (e.g., \"laptop\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "google_ads",
+          "fixed": {
+            "target": "google_ads",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_lens",
+          "title": "Google Lens",
+          "description": "Run a Google Lens image search for an image URL through the Decodo Web Data API (`google_lens` target) and return the parsed visual matches as JSON. Use it to identify what an image shows or find pages where it appears. Docs: https://help.decodo.com/docs/web-scraping-api-google-lens",
+          "group": "search",
+          "fields": [
+            "query",
+            "headless",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Image URL for Google Lens search (e.g., \"https://example.com/image.jpg\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "google_lens",
+          "fixed": {
+            "target": "google_lens",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_ai_mode",
+          "title": "Google AI Mode",
+          "description": "Ask Google AI Mode a question through the Decodo Web Data API (`google_ai_mode` target) and return its AI answer as JSON. Use it to see what Google's AI search says about a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-ai-mode",
+          "group": "ai",
+          "fields": [
+            "query",
+            "geo",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Google AI Mode (e.g., \"What are the top three dog breeds?\")",
+            "geo": "Geo location for AI mode search (e.g., \"us\", \"uk\")",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "google_ai_mode",
+          "fixed": {
+            "target": "google_ai_mode",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_travel_hotels",
+          "title": "Google Travel Hotels",
+          "description": "Search Google Travel for hotels through the Decodo Web Data API (`google_travel_hotels` target) and return the listings as Markdown. Use it to find hotel options and prices for a destination. Docs: https://help.decodo.com/docs/web-scraping-api-google-travel-hotels",
+          "group": "search",
+          "fields": [
+            "query",
+            "headless",
+            "locale",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Hotel search query (e.g., \"trivago\", \"hotels in Paris\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "locale": "Locale of the desired request",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "google_travel_hotels",
+          "fixed": {
+            "target": "google_travel_hotels",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_search",
+          "title": "Amazon Search",
+          "description": "Search Amazon for a keyword through the Decodo Web Data API (`amazon_search` target) and return the product listings parsed as JSON. Use it to find products and compare listings on a chosen Amazon domain. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "geo",
+            "headless",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Amazon products (e.g., \"wireless keyboard\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_search",
+          "fixed": {
+            "target": "amazon_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_product",
+          "title": "Amazon Product",
+          "description": "Fetch an Amazon product page by ASIN through the Decodo Web Data API (`amazon_product` target) and return its details parsed as JSON. Use it when you know the product's ASIN and need its title, price, rating or description. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-product",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_product",
+          "fixed": {
+            "target": "amazon_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_pricing",
+          "title": "Amazon Pricing",
+          "description": "Fetch the offers for an Amazon product by ASIN through the Decodo Web Data API (`amazon_pricing` target) and return them parsed as JSON. Use it to compare what different sellers charge for the same product. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-pricing",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "page_from",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_pricing",
+          "fixed": {
+            "target": "amazon_pricing",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_sellers",
+          "title": "Amazon Sellers",
+          "description": "Fetch an Amazon seller profile by seller ID through the Decodo Web Data API (`amazon_sellers` target) and return it parsed as JSON. Use it to check a seller's name, rating and feedback. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-sellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon seller ID (e.g., \"A1R0Z7FJGTKESH\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_sellers",
+          "fixed": {
+            "target": "amazon_sellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_bestsellers",
+          "title": "Amazon Bestsellers",
+          "description": "Fetch the Amazon Best Sellers list for a category through the Decodo Web Data API (`amazon_bestsellers` target) and return it parsed as JSON. Use it to see the top-selling products in a category. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-bestsellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Amazon category (e.g., \"mobile-apps\", \"electronics\")",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_bestsellers",
+          "fixed": {
+            "target": "amazon_bestsellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_search",
+          "title": "Walmart Search",
+          "description": "Search Walmart for a keyword through the Decodo Web Data API (`walmart_search` target) and return the results as Markdown. Use it to find Walmart products, optionally for a store or delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Walmart products (e.g., \"camping tent\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_search",
+          "fixed": {
+            "target": "walmart_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_product",
+          "title": "Walmart Product",
+          "description": "Fetch a Walmart product page by product ID through the Decodo Web Data API (`walmart_product` target) and return its details parsed as JSON. Use it when you know the product ID and need its price, availability or description. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "product_id": "Walmart product ID (e.g., \"15296401808\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_product",
+          "fixed": {
+            "target": "walmart_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "target_search",
+          "title": "Target Search",
+          "description": "Search Target for a keyword through the Decodo Web Data API (`target_search` target) and return the results as Markdown. Use it to find products sold by the Target retail store, optionally for a delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-target-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "device_type",
+            "delivery_zip"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Target products",
+            "device_type": "Device type to emulate for the request",
+            "delivery_zip": "ZIP code for delivery location"
+          },
+          "flow": "scrape",
+          "target": "target_search",
+          "fixed": {
+            "target": "target_search",
+            "headless": "html",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "target_product",
+          "title": "Target Product",
+          "description": "Fetch a Target product page by product ID through the Decodo Web Data API (`target_product` target) and return its details parsed as JSON. Use it when you know a Target product ID and need its price, availability or description. Docs: https://help.decodo.com/docs/web-scraping-api-target-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "device_type",
+            "delivery_zip"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "product_id": "Target product ID (e.g., \"1003921355\")",
+            "device_type": "Device type to emulate for the request",
+            "delivery_zip": "ZIP code for delivery location"
+          },
+          "flow": "scrape",
+          "target": "target_product",
+          "fixed": {
+            "target": "target_product",
+            "parse": true,
+            "headless": "html"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_post",
+          "title": "TikTok Post",
+          "description": "Fetch a TikTok video post by URL through the Decodo Web Data API (`tiktok_post` target) and return the page's raw HTML, often several hundred KB. Use it to analyse a specific TikTok video; set xhr to get a JSON list of the page's XHR/fetch requests instead of the HTML. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-post",
+          "group": "social_media",
+          "fields": [
+            "url",
+            "xhr"
+          ],
+          "required": [
+            "url"
+          ],
+          "descriptions": {
+            "url": "TikTok post URL, e.g. https://www.tiktok.com/@user/video/1234567890",
+            "xhr": "When true, includes XHR/fetch responses in the scrape result where supported by the target"
+          },
+          "flow": "scrape",
+          "target": "tiktok_post",
+          "fixed": {
+            "target": "tiktok_post"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_search",
+          "title": "TikTok Shop Search",
+          "description": "Search TikTok Shop for a keyword through the Decodo Web Data API (`tiktok_shop_search` target) and return the results as Markdown. Use it to find products sold on TikTok Shop in a given country. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "country",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for TikTok Shop products",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "country": "Country code for the request (e.g., US, GB, DE)",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_search",
+          "fixed": {
+            "target": "tiktok_shop_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_product",
+          "title": "TikTok Shop Product",
+          "description": "Fetch a TikTok Shop product page by product ID through the Decodo Web Data API (`tiktok_shop_product` target) and return it as Markdown. Use it when you know a TikTok Shop product ID and need its price, seller or description. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "device_type",
+            "country"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "product_id": "TikTok Shop product ID (e.g., \"1731541214379741272\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request",
+            "country": "Country code for the request (e.g., US, GB, DE)"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_product",
+          "fixed": {
+            "target": "tiktok_shop_product",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_url",
+          "title": "TikTok Shop URL",
+          "description": "Fetch any TikTok Shop page by URL through the Decodo Web Data API (`tiktok` target) and return the page's raw HTML, often several hundred KB. Use it for TikTok Shop pages that tiktok_shop_search and tiktok_shop_product do not cover, such as a shop or category URL. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-url",
+          "group": "ecommerce",
+          "fields": [
+            "url",
+            "headless"
+          ],
+          "required": [
+            "url"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "url": "TikTok Shop URL (e.g., \"https://www.tiktok.com/shop/s?q=HEADPHONES\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "flow": "scrape",
+          "target": "tiktok",
+          "fixed": {
+            "target": "tiktok"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_metadata",
+          "title": "YouTube Metadata",
+          "description": "Fetch a YouTube video's metadata by video ID through the Decodo Web Data API (`youtube_metadata` target) and return it as JSON, such as title, channel, views and description. Use it when you know the video ID and need details about the video. Docs: https://help.decodo.com/docs/web-scraping-youtube-metadata",
+          "group": "social_media",
+          "fields": [
+            "query"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"dFu9aKJoqGg\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_metadata",
+          "fixed": {
+            "target": "youtube_metadata"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_channel",
+          "title": "YouTube Channel",
+          "description": "Fetch the videos of a YouTube channel by handle or ID through the Decodo Web Data API (`youtube_channel` target) and return them parsed as JSON. Use it to list what a channel has published. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-channel",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "limit"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube channel handle or ID (e.g., \"@decodo_official\")",
+            "limit": "Maximum number of videos to return"
+          },
+          "flow": "scrape",
+          "target": "youtube_channel",
+          "fixed": {
+            "target": "youtube_channel",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_subtitles",
+          "title": "YouTube Subtitles",
+          "description": "Fetch the subtitles of a YouTube video by video ID through the Decodo Web Data API (`youtube_subtitles` target) and return them as JSON. Use it to read or summarise what is said in a video; set `language_code` for a specific language. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-subtitles",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "language_code"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"L8zSWbQN-v8\")",
+            "language_code": "Language code for subtitles (e.g., \"en\", \"es\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_subtitles",
+          "fixed": {
+            "target": "youtube_subtitles"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_search",
+          "title": "YouTube Search",
+          "description": "Search YouTube for videos through the Decodo Web Data API (`youtube_search` target) and return the results as JSON. Use it to find videos on a topic before fetching their metadata or subtitles. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-search",
+          "group": "social_media",
+          "fields": [
+            "query"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube search query (e.g., \"How to care for chinchillas\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_search",
+          "fixed": {
+            "target": "youtube_search"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "bing_search",
+          "title": "Bing Search",
+          "description": "Search Bing through the Decodo Web Data API (`bing_search` target) and return the parsed results page as JSON. Use it when Bing results are needed specifically, or to compare them with Google. Docs: https://help.decodo.com/docs/web-scraping-api-bing-search",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless",
+            "domain",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Bing (e.g., \"laptop\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Bing domain (e.g., bing.com, bing.co.uk)",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "bing_search",
+          "fixed": {
+            "target": "bing_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "chatgpt",
+          "title": "ChatGPT",
+          "description": "Send one prompt to ChatGPT through the Decodo Web Data API (`chatgpt` target) and return its answer parsed as JSON. Each call is a single prompt and answer, with no conversation history; set `search` to let ChatGPT use web search. Use it to see how ChatGPT answers a question, for example to check how it describes a brand. Docs: https://help.decodo.com/docs/web-scraping-api-chatgpt",
+          "group": "ai",
+          "fields": [
+            "prompt",
+            "search",
+            "geo"
+          ],
+          "required": [
+            "prompt"
+          ],
+          "descriptions": {
+            "prompt": "Prompt to send to ChatGPT",
+            "search": "Activates ChatGPT's web search functionality",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "flow": "scrape",
+          "target": "chatgpt",
+          "fixed": {
+            "target": "chatgpt",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "perplexity",
+          "title": "Perplexity",
+          "description": "Send one prompt to Perplexity through the Decodo Web Data API (`perplexity` target) and return its answer parsed as JSON. Each call is a single prompt and answer, with no conversation history. Use it to see how Perplexity answers a question and which sources it draws on. Docs: https://help.decodo.com/docs/web-scraping-api-perplexity",
+          "group": "ai",
+          "fields": [
+            "prompt",
+            "geo"
+          ],
+          "required": [
+            "prompt"
+          ],
+          "descriptions": {
+            "prompt": "Prompt to send to Perplexity",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "flow": "scrape",
+          "target": "perplexity",
+          "fixed": {
+            "target": "perplexity",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        }
+      ]
+    },
+    "mcp-docker": {
+      "tools": [
+        {
+          "name": "scrape_as_markdown",
+          "title": "Scrape as Markdown",
+          "description": "Fetch any public web page through the Decodo Web Data API (`universal` target) and return its content as Markdown. Use it to read a specific URL when no site-specific tool fits; very long pages are truncated, and `tokenLimit` sets a lower cap. Docs: https://help.decodo.com/docs/web-data-api-markdown-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal"
+          },
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "url": "URL to scrape",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          },
+          "limits": {
+            "maxTextChars": 45000
+          }
+        },
+        {
+          "name": "screenshot",
+          "title": "Screenshot",
+          "description": "Capture a PNG screenshot of a web page through the Decodo Web Data API (`universal` target with PNG output). Use it when the page layout or visuals matter, not just its text. Docs: https://help.decodo.com/docs/web-data-api-screenshot-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal",
+            "headless": "png"
+          },
+          "descriptions": {
+            "url": "URL to screenshot",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "map",
+          "title": "Map Website",
+          "description": "List the URLs on a website without fetching their content. Large sites can overflow your context, so `limit` defaults to 10; narrow with select_paths or exclude_paths. For precise work, map the site, then scrape_as_markdown only the pages you need.",
+          "group": "web",
+          "flow": "map",
+          "fields": [
+            "url",
+            "limit",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 500
+          },
+          "descriptions": {
+            "url": "Website URL to map",
+            "limit": "Maximum number of URLs to return, 10 by default and at most 500",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_start",
+          "title": "Start Crawl",
+          "description": "Start crawling a website and return the crawl id right away, without waiting for it to finish. Check progress with crawl_status, read pages with crawl_results and stop it early with crawl_cancel. Crawled content can overflow your context, so `limit` defaults to 10 pages. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "start",
+          "fields": [
+            "url",
+            "limit",
+            "max_depth",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "output": "markdown"
+          },
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 100
+          },
+          "descriptions": {
+            "url": "Website URL to start crawling from",
+            "limit": "Maximum number of pages to crawl, 10 by default and at most 100",
+            "max_depth": "How many links deep to follow from the start URL",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_status",
+          "title": "Crawl Status",
+          "description": "Report the progress of a crawl started with crawl_start: its status and how many pages were discovered, completed and failed. The crawl is finished once status is no longer \"pending\".",
+          "group": "web",
+          "flow": "crawl",
+          "step": "status",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "crawl_results",
+          "title": "Crawl Results",
+          "description": "Return crawled pages as Markdown from a crawl started with crawl_start, a few at a time. Call it once crawl_status reports the crawl is no longer \"pending\". Crawled pages can be long and overflow your context, so each call returns at most about 50 KB and up to `limit` pages (10 by default). A page too long for one call is split across calls; each part carries contentPart with its character range. Pass nextCursor back to get the rest; when it is missing, you have every page. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "results",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          },
+          "limits": {
+            "maxResultChars": 49000
+          }
+        },
+        {
+          "name": "crawl_cancel",
+          "title": "Cancel Crawl",
+          "description": "Stop a crawl started with crawl_start so it crawls no more pages. Pages crawled before the cancel stay readable with crawl_results.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "cancel",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "search",
+          "title": "Web Search",
+          "description": "Search the web and return ranked results with title, link and description. Results can overflow your context, so `limit` defaults to 10. To read a result, pass its link to scrape_as_markdown.",
+          "group": "search",
+          "flow": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "page"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "page": "Results page to return, 1 by default"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "google_search",
+          "title": "Google Search",
+          "description": "Search Google through the Decodo Web Data API (`google_search` target) and return the parsed results page as JSON, including organic results. Use it for fresh web results or Google rankings for a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-search",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "flow": "scrape",
+          "target": "google_search",
+          "fixed": {
+            "target": "google_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_ads",
+          "title": "Google Ads",
+          "description": "Search Google through the Decodo Web Data API (`google_ads` target) and return the paid Google Ads shown for a query, parsed as JSON. Use it to see which advertisers bid on a keyword and what their ads say. Docs: https://help.decodo.com/docs/web-scraping-api-google-ads",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Google Ads (e.g., \"laptop\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "google_ads",
+          "fixed": {
+            "target": "google_ads",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_lens",
+          "title": "Google Lens",
+          "description": "Run a Google Lens image search for an image URL through the Decodo Web Data API (`google_lens` target) and return the parsed visual matches as JSON. Use it to identify what an image shows or find pages where it appears. Docs: https://help.decodo.com/docs/web-scraping-api-google-lens",
+          "group": "search",
+          "fields": [
+            "query",
+            "headless",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Image URL for Google Lens search (e.g., \"https://example.com/image.jpg\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "google_lens",
+          "fixed": {
+            "target": "google_lens",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_ai_mode",
+          "title": "Google AI Mode",
+          "description": "Ask Google AI Mode a question through the Decodo Web Data API (`google_ai_mode` target) and return its AI answer as JSON. Use it to see what Google's AI search says about a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-ai-mode",
+          "group": "ai",
+          "fields": [
+            "query",
+            "geo",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Google AI Mode (e.g., \"What are the top three dog breeds?\")",
+            "geo": "Geo location for AI mode search (e.g., \"us\", \"uk\")",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "google_ai_mode",
+          "fixed": {
+            "target": "google_ai_mode",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_travel_hotels",
+          "title": "Google Travel Hotels",
+          "description": "Search Google Travel for hotels through the Decodo Web Data API (`google_travel_hotels` target) and return the listings as Markdown. Use it to find hotel options and prices for a destination. Docs: https://help.decodo.com/docs/web-scraping-api-google-travel-hotels",
+          "group": "search",
+          "fields": [
+            "query",
+            "headless",
+            "locale",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Hotel search query (e.g., \"trivago\", \"hotels in Paris\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "locale": "Locale of the desired request",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "google_travel_hotels",
+          "fixed": {
+            "target": "google_travel_hotels",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_search",
+          "title": "Amazon Search",
+          "description": "Search Amazon for a keyword through the Decodo Web Data API (`amazon_search` target) and return the product listings parsed as JSON. Use it to find products and compare listings on a chosen Amazon domain. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "geo",
+            "headless",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Amazon products (e.g., \"wireless keyboard\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_search",
+          "fixed": {
+            "target": "amazon_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_product",
+          "title": "Amazon Product",
+          "description": "Fetch an Amazon product page by ASIN through the Decodo Web Data API (`amazon_product` target) and return its details parsed as JSON. Use it when you know the product's ASIN and need its title, price, rating or description. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-product",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_product",
+          "fixed": {
+            "target": "amazon_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_pricing",
+          "title": "Amazon Pricing",
+          "description": "Fetch the offers for an Amazon product by ASIN through the Decodo Web Data API (`amazon_pricing` target) and return them parsed as JSON. Use it to compare what different sellers charge for the same product. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-pricing",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "page_from",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_pricing",
+          "fixed": {
+            "target": "amazon_pricing",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_sellers",
+          "title": "Amazon Sellers",
+          "description": "Fetch an Amazon seller profile by seller ID through the Decodo Web Data API (`amazon_sellers` target) and return it parsed as JSON. Use it to check a seller's name, rating and feedback. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-sellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon seller ID (e.g., \"A1R0Z7FJGTKESH\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_sellers",
+          "fixed": {
+            "target": "amazon_sellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_bestsellers",
+          "title": "Amazon Bestsellers",
+          "description": "Fetch the Amazon Best Sellers list for a category through the Decodo Web Data API (`amazon_bestsellers` target) and return it parsed as JSON. Use it to see the top-selling products in a category. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-bestsellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Amazon category (e.g., \"mobile-apps\", \"electronics\")",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_bestsellers",
+          "fixed": {
+            "target": "amazon_bestsellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_search",
+          "title": "Walmart Search",
+          "description": "Search Walmart for a keyword through the Decodo Web Data API (`walmart_search` target) and return the results as Markdown. Use it to find Walmart products, optionally for a store or delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Walmart products (e.g., \"camping tent\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_search",
+          "fixed": {
+            "target": "walmart_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_product",
+          "title": "Walmart Product",
+          "description": "Fetch a Walmart product page by product ID through the Decodo Web Data API (`walmart_product` target) and return its details parsed as JSON. Use it when you know the product ID and need its price, availability or description. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "product_id": "Walmart product ID (e.g., \"15296401808\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_product",
+          "fixed": {
+            "target": "walmart_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "target_search",
+          "title": "Target Search",
+          "description": "Search Target for a keyword through the Decodo Web Data API (`target_search` target) and return the results as Markdown. Use it to find products sold by the Target retail store, optionally for a delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-target-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "device_type",
+            "delivery_zip"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Target products",
+            "device_type": "Device type to emulate for the request",
+            "delivery_zip": "ZIP code for delivery location"
+          },
+          "flow": "scrape",
+          "target": "target_search",
+          "fixed": {
+            "target": "target_search",
+            "headless": "html",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "target_product",
+          "title": "Target Product",
+          "description": "Fetch a Target product page by product ID through the Decodo Web Data API (`target_product` target) and return its details parsed as JSON. Use it when you know a Target product ID and need its price, availability or description. Docs: https://help.decodo.com/docs/web-scraping-api-target-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "device_type",
+            "delivery_zip"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "product_id": "Target product ID (e.g., \"1003921355\")",
+            "device_type": "Device type to emulate for the request",
+            "delivery_zip": "ZIP code for delivery location"
+          },
+          "flow": "scrape",
+          "target": "target_product",
+          "fixed": {
+            "target": "target_product",
+            "parse": true,
+            "headless": "html"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_post",
+          "title": "TikTok Post",
+          "description": "Fetch a TikTok video post by URL through the Decodo Web Data API (`tiktok_post` target) and return the page's raw HTML, often several hundred KB. Use it to analyse a specific TikTok video; set xhr to get a JSON list of the page's XHR/fetch requests instead of the HTML. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-post",
+          "group": "social_media",
+          "fields": [
+            "url",
+            "xhr"
+          ],
+          "required": [
+            "url"
+          ],
+          "descriptions": {
+            "url": "TikTok post URL, e.g. https://www.tiktok.com/@user/video/1234567890",
+            "xhr": "When true, includes XHR/fetch responses in the scrape result where supported by the target"
+          },
+          "flow": "scrape",
+          "target": "tiktok_post",
+          "fixed": {
+            "target": "tiktok_post"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_search",
+          "title": "TikTok Shop Search",
+          "description": "Search TikTok Shop for a keyword through the Decodo Web Data API (`tiktok_shop_search` target) and return the results as Markdown. Use it to find products sold on TikTok Shop in a given country. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "country",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for TikTok Shop products",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "country": "Country code for the request (e.g., US, GB, DE)",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_search",
+          "fixed": {
+            "target": "tiktok_shop_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_product",
+          "title": "TikTok Shop Product",
+          "description": "Fetch a TikTok Shop product page by product ID through the Decodo Web Data API (`tiktok_shop_product` target) and return it as Markdown. Use it when you know a TikTok Shop product ID and need its price, seller or description. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "device_type",
+            "country"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "product_id": "TikTok Shop product ID (e.g., \"1731541214379741272\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request",
+            "country": "Country code for the request (e.g., US, GB, DE)"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_product",
+          "fixed": {
+            "target": "tiktok_shop_product",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_url",
+          "title": "TikTok Shop URL",
+          "description": "Fetch any TikTok Shop page by URL through the Decodo Web Data API (`tiktok` target) and return the page's raw HTML, often several hundred KB. Use it for TikTok Shop pages that tiktok_shop_search and tiktok_shop_product do not cover, such as a shop or category URL. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-url",
+          "group": "ecommerce",
+          "fields": [
+            "url",
+            "headless"
+          ],
+          "required": [
+            "url"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "url": "TikTok Shop URL (e.g., \"https://www.tiktok.com/shop/s?q=HEADPHONES\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "flow": "scrape",
+          "target": "tiktok",
+          "fixed": {
+            "target": "tiktok"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_metadata",
+          "title": "YouTube Metadata",
+          "description": "Fetch a YouTube video's metadata by video ID through the Decodo Web Data API (`youtube_metadata` target) and return it as JSON, such as title, channel, views and description. Use it when you know the video ID and need details about the video. Docs: https://help.decodo.com/docs/web-scraping-youtube-metadata",
+          "group": "social_media",
+          "fields": [
+            "query"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"dFu9aKJoqGg\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_metadata",
+          "fixed": {
+            "target": "youtube_metadata"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_channel",
+          "title": "YouTube Channel",
+          "description": "Fetch the videos of a YouTube channel by handle or ID through the Decodo Web Data API (`youtube_channel` target) and return them parsed as JSON. Use it to list what a channel has published. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-channel",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "limit"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube channel handle or ID (e.g., \"@decodo_official\")",
+            "limit": "Maximum number of videos to return"
+          },
+          "flow": "scrape",
+          "target": "youtube_channel",
+          "fixed": {
+            "target": "youtube_channel",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_subtitles",
+          "title": "YouTube Subtitles",
+          "description": "Fetch the subtitles of a YouTube video by video ID through the Decodo Web Data API (`youtube_subtitles` target) and return them as JSON. Use it to read or summarise what is said in a video; set `language_code` for a specific language. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-subtitles",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "language_code"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"L8zSWbQN-v8\")",
+            "language_code": "Language code for subtitles (e.g., \"en\", \"es\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_subtitles",
+          "fixed": {
+            "target": "youtube_subtitles"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_search",
+          "title": "YouTube Search",
+          "description": "Search YouTube for videos through the Decodo Web Data API (`youtube_search` target) and return the results as JSON. Use it to find videos on a topic before fetching their metadata or subtitles. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-search",
+          "group": "social_media",
+          "fields": [
+            "query"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube search query (e.g., \"How to care for chinchillas\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_search",
+          "fixed": {
+            "target": "youtube_search"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "bing_search",
+          "title": "Bing Search",
+          "description": "Search Bing through the Decodo Web Data API (`bing_search` target) and return the parsed results page as JSON. Use it when Bing results are needed specifically, or to compare them with Google. Docs: https://help.decodo.com/docs/web-scraping-api-bing-search",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless",
+            "domain",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Bing (e.g., \"laptop\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Bing domain (e.g., bing.com, bing.co.uk)",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "bing_search",
+          "fixed": {
+            "target": "bing_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "chatgpt",
+          "title": "ChatGPT",
+          "description": "Send one prompt to ChatGPT through the Decodo Web Data API (`chatgpt` target) and return its answer parsed as JSON. Each call is a single prompt and answer, with no conversation history; set `search` to let ChatGPT use web search. Use it to see how ChatGPT answers a question, for example to check how it describes a brand. Docs: https://help.decodo.com/docs/web-scraping-api-chatgpt",
+          "group": "ai",
+          "fields": [
+            "prompt",
+            "search",
+            "geo"
+          ],
+          "required": [
+            "prompt"
+          ],
+          "descriptions": {
+            "prompt": "Prompt to send to ChatGPT",
+            "search": "Activates ChatGPT's web search functionality",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "flow": "scrape",
+          "target": "chatgpt",
+          "fixed": {
+            "target": "chatgpt",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        }
+      ]
+    },
+    "mcp-hosted": {
+      "tools": [
+        {
+          "name": "scrape_as_markdown",
+          "title": "Scrape as Markdown",
+          "description": "Fetch any public web page through the Decodo Web Data API (`universal` target) and return its content as Markdown. Use it to read a specific URL when no site-specific tool fits; very long pages are truncated, and `tokenLimit` sets a lower cap. Docs: https://help.decodo.com/docs/web-data-api-markdown-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal"
+          },
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "url": "URL to scrape",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          },
+          "limits": {
+            "maxTextChars": 45000
+          }
+        },
+        {
+          "name": "screenshot",
+          "title": "Screenshot",
+          "description": "Capture a PNG screenshot of a web page through the Decodo Web Data API (`universal` target with PNG output). Use it when the page layout or visuals matter, not just its text. Docs: https://help.decodo.com/docs/web-data-api-screenshot-response",
+          "group": "web",
+          "flow": "scrape",
+          "target": "universal",
+          "fields": [
+            "url",
+            "geo"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "target": "universal",
+            "headless": "png"
+          },
+          "descriptions": {
+            "url": "URL to screenshot",
+            "geo": "Geolocation of the desired request, expressed as a country name"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "map",
+          "title": "Map Website",
+          "description": "List the URLs on a website without fetching their content. Large sites can overflow your context, so `limit` defaults to 10; narrow with select_paths or exclude_paths. For precise work, map the site, then scrape_as_markdown only the pages you need.",
+          "group": "web",
+          "flow": "map",
+          "fields": [
+            "url",
+            "limit",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 500
+          },
+          "descriptions": {
+            "url": "Website URL to map",
+            "limit": "Maximum number of URLs to return, 10 by default and at most 500",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_start",
+          "title": "Start Crawl",
+          "description": "Start crawling a website and return the crawl id right away, without waiting for it to finish. Check progress with crawl_status, read pages with crawl_results and stop it early with crawl_cancel. Crawled content can overflow your context, so `limit` defaults to 10 pages. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "start",
+          "fields": [
+            "url",
+            "limit",
+            "max_depth",
+            "sitemap",
+            "domain_filter",
+            "select_paths",
+            "exclude_paths",
+            "geo",
+            "locale"
+          ],
+          "required": [
+            "url"
+          ],
+          "fixed": {
+            "output": "markdown"
+          },
+          "defaults": {
+            "limit": 10
+          },
+          "minimums": {
+            "limit": 1
+          },
+          "maximums": {
+            "limit": 100
+          },
+          "descriptions": {
+            "url": "Website URL to start crawling from",
+            "limit": "Maximum number of pages to crawl, 10 by default and at most 100",
+            "max_depth": "How many links deep to follow from the start URL",
+            "sitemap": "Whether to use the sitemap alongside links found on pages, only the sitemap, or skip it",
+            "domain_filter": "Which links to follow: the same domain, its subdomains too, or any domain",
+            "select_paths": "Only keep URLs whose path matches one of these patterns, e.g. ^/blog",
+            "exclude_paths": "Drop URLs whose path matches one of these patterns",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request"
+          }
+        },
+        {
+          "name": "crawl_status",
+          "title": "Crawl Status",
+          "description": "Report the progress of a crawl started with crawl_start: its status and how many pages were discovered, completed and failed. The crawl is finished once status is no longer \"pending\".",
+          "group": "web",
+          "flow": "crawl",
+          "step": "status",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "crawl_results",
+          "title": "Crawl Results",
+          "description": "Return crawled pages as Markdown from a crawl started with crawl_start, a few at a time. Call it once crawl_status reports the crawl is no longer \"pending\". Crawled pages can be long and overflow your context, so each call returns at most about 50 KB and up to `limit` pages (10 by default). A page too long for one call is split across calls; each part carries contentPart with its character range. Pass nextCursor back to get the rest; when it is missing, you have every page. For precise work, prefer map plus scrape_as_markdown on the pages you need.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "results",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          },
+          "limits": {
+            "maxResultChars": 49000
+          }
+        },
+        {
+          "name": "crawl_cancel",
+          "title": "Cancel Crawl",
+          "description": "Stop a crawl started with crawl_start so it crawls no more pages. Pages crawled before the cancel stay readable with crawl_results.",
+          "group": "web",
+          "flow": "crawl",
+          "step": "cancel",
+          "descriptions": {
+            "crawl_id": "Crawl id returned by crawl_start"
+          }
+        },
+        {
+          "name": "search",
+          "title": "Web Search",
+          "description": "Search the web and return ranked results with title, link and description. Results can overflow your context, so `limit` defaults to 10. To read a result, pass its link to scrape_as_markdown.",
+          "group": "search",
+          "flow": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "page"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "page": "Results page to return, 1 by default"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              }
+            ]
+          }
+        },
+        {
+          "name": "google_search",
+          "title": "Google Search",
+          "description": "Search Google through the Decodo Web Data API (`google_search` target) and return the parsed results page as JSON, including organic results. Use it for fresh web results or Google rankings for a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-search",
+          "group": "search",
+          "fields": [
+            "query",
+            "geo",
+            "locale",
+            "headless"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "locale": "Locale of the desired request",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise"
+          },
+          "flow": "scrape",
+          "target": "google_search",
+          "fixed": {
+            "target": "google_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_ai_mode",
+          "title": "Google AI Mode",
+          "description": "Ask Google AI Mode a question through the Decodo Web Data API (`google_ai_mode` target) and return its AI answer as JSON. Use it to see what Google's AI search says about a query. Docs: https://help.decodo.com/docs/web-scraping-api-google-ai-mode",
+          "group": "ai",
+          "fields": [
+            "query",
+            "geo",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Google AI Mode (e.g., \"What are the top three dog breeds?\")",
+            "geo": "Geo location for AI mode search (e.g., \"us\", \"uk\")",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "google_ai_mode",
+          "fixed": {
+            "target": "google_ai_mode",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "google_travel_hotels",
+          "title": "Google Travel Hotels",
+          "description": "Search Google Travel for hotels through the Decodo Web Data API (`google_travel_hotels` target) and return the listings as Markdown. Use it to find hotel options and prices for a destination. Docs: https://help.decodo.com/docs/web-scraping-api-google-travel-hotels",
+          "group": "search",
+          "fields": [
+            "query",
+            "headless",
+            "locale",
+            "device_type",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Hotel search query (e.g., \"trivago\", \"hotels in Paris\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "locale": "Locale of the desired request",
+            "device_type": "Device type to emulate for the request",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "google_travel_hotels",
+          "fixed": {
+            "target": "google_travel_hotels",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_search",
+          "title": "Amazon Search",
+          "description": "Search Amazon for a keyword through the Decodo Web Data API (`amazon_search` target) and return the product listings parsed as JSON. Use it to find products and compare listings on a chosen Amazon domain. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "geo",
+            "headless",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Amazon products (e.g., \"wireless keyboard\")",
+            "geo": "Geolocation of the desired request, expressed as a country name",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_search",
+          "fixed": {
+            "target": "amazon_search",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_product",
+          "title": "Amazon Product",
+          "description": "Fetch an Amazon product page by ASIN through the Decodo Web Data API (`amazon_product` target) and return its details parsed as JSON. Use it when you know the product's ASIN and need its title, price, rating or description. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-product",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_product",
+          "fixed": {
+            "target": "amazon_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_pricing",
+          "title": "Amazon Pricing",
+          "description": "Fetch the offers for an Amazon product by ASIN through the Decodo Web Data API (`amazon_pricing` target) and return them parsed as JSON. Use it to compare what different sellers charge for the same product. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-pricing",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "page_from",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon product ASIN (e.g., \"B09H74FXNW\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_pricing",
+          "fixed": {
+            "target": "amazon_pricing",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_sellers",
+          "title": "Amazon Sellers",
+          "description": "Fetch an Amazon seller profile by seller ID through the Decodo Web Data API (`amazon_sellers` target) and return it parsed as JSON. Use it to check a seller's name, rating and feedback. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-sellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "domain",
+            "geo"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Amazon seller ID (e.g., \"A1R0Z7FJGTKESH\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "geo": "Amazon geo location (e.g., 10001 for US ZIP code)"
+          },
+          "flow": "scrape",
+          "target": "amazon_sellers",
+          "fixed": {
+            "target": "amazon_sellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "amazon_bestsellers",
+          "title": "Amazon Bestsellers",
+          "description": "Fetch the Amazon Best Sellers list for a category through the Decodo Web Data API (`amazon_bestsellers` target) and return it parsed as JSON. Use it to see the top-selling products in a category. Docs: https://help.decodo.com/docs/web-scraping-api-amazon-bestsellers",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "domain",
+            "page_from"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "Amazon category (e.g., \"mobile-apps\", \"electronics\")",
+            "domain": "Amazon domain (e.g., amazon.com, amazon.co.uk)",
+            "page_from": "Starting page number for pagination"
+          },
+          "flow": "scrape",
+          "target": "amazon_bestsellers",
+          "fixed": {
+            "target": "amazon_bestsellers",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_search",
+          "title": "Walmart Search",
+          "description": "Search Walmart for a keyword through the Decodo Web Data API (`walmart_search` target) and return the results as Markdown. Use it to find Walmart products, optionally for a store or delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Walmart products (e.g., \"camping tent\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_search",
+          "fixed": {
+            "target": "walmart_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "walmart_product",
+          "title": "Walmart Product",
+          "description": "Fetch a Walmart product page by product ID through the Decodo Web Data API (`walmart_product` target) and return its details parsed as JSON. Use it when you know the product ID and need its price, availability or description. Docs: https://help.decodo.com/docs/web-scraping-api-walmart-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "delivery_zip",
+            "walmart_store_id"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ]
+          },
+          "descriptions": {
+            "product_id": "Walmart product ID (e.g., \"15296401808\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "delivery_zip": "ZIP code for delivery location",
+            "walmart_store_id": "Walmart store ID for local inventory"
+          },
+          "flow": "scrape",
+          "target": "walmart_product",
+          "fixed": {
+            "target": "walmart_product",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "target_search",
+          "title": "Target Search",
+          "description": "Search Target for a keyword through the Decodo Web Data API (`target_search` target) and return the results as Markdown. Use it to find products sold by the Target retail store, optionally for a delivery ZIP code. Docs: https://help.decodo.com/docs/web-scraping-api-target-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "device_type",
+            "delivery_zip"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for Target products",
+            "device_type": "Device type to emulate for the request",
+            "delivery_zip": "ZIP code for delivery location"
+          },
+          "flow": "scrape",
+          "target": "target_search",
+          "fixed": {
+            "target": "target_search",
+            "headless": "html",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_search",
+          "title": "TikTok Shop Search",
+          "description": "Search TikTok Shop for a keyword through the Decodo Web Data API (`tiktok_shop_search` target) and return the results as Markdown. Use it to find products sold on TikTok Shop in a given country. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-search",
+          "group": "ecommerce",
+          "fields": [
+            "query",
+            "headless",
+            "country",
+            "device_type"
+          ],
+          "required": [
+            "query"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "query": "Search query for TikTok Shop products",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "country": "Country code for the request (e.g., US, GB, DE)",
+            "device_type": "Device type to emulate for the request"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_search",
+          "fixed": {
+            "target": "tiktok_shop_search",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "tiktok_shop_product",
+          "title": "TikTok Shop Product",
+          "description": "Fetch a TikTok Shop product page by product ID through the Decodo Web Data API (`tiktok_shop_product` target) and return it as Markdown. Use it when you know a TikTok Shop product ID and need its price, seller or description. Docs: https://help.decodo.com/docs/web-scraping-api-tiktok-shop-product",
+          "group": "ecommerce",
+          "fields": [
+            "product_id",
+            "headless",
+            "device_type",
+            "country"
+          ],
+          "required": [
+            "product_id"
+          ],
+          "choices": {
+            "headless": [
+              "html"
+            ],
+            "device_type": [
+              "desktop",
+              "mobile",
+              "tablet"
+            ]
+          },
+          "descriptions": {
+            "product_id": "TikTok Shop product ID (e.g., \"1731541214379741272\")",
+            "headless": "Set to 'html' to open the page in a headless browser; leave it out otherwise",
+            "device_type": "Device type to emulate for the request",
+            "country": "Country code for the request (e.g., US, GB, DE)"
+          },
+          "flow": "scrape",
+          "target": "tiktok_shop_product",
+          "fixed": {
+            "target": "tiktok_shop_product",
+            "markdown": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_metadata",
+          "title": "YouTube Metadata",
+          "description": "Fetch a YouTube video's metadata by video ID through the Decodo Web Data API (`youtube_metadata` target) and return it as JSON, such as title, channel, views and description. Use it when you know the video ID and need details about the video. Docs: https://help.decodo.com/docs/web-scraping-youtube-metadata",
+          "group": "social_media",
+          "fields": [
+            "query"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"dFu9aKJoqGg\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_metadata",
+          "fixed": {
+            "target": "youtube_metadata"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_channel",
+          "title": "YouTube Channel",
+          "description": "Fetch the videos of a YouTube channel by handle or ID through the Decodo Web Data API (`youtube_channel` target) and return them parsed as JSON. Use it to list what a channel has published. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-channel",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "limit"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube channel handle or ID (e.g., \"@decodo_official\")",
+            "limit": "Maximum number of videos to return"
+          },
+          "flow": "scrape",
+          "target": "youtube_channel",
+          "fixed": {
+            "target": "youtube_channel",
+            "parse": true
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
+          }
+        },
+        {
+          "name": "youtube_subtitles",
+          "title": "YouTube Subtitles",
+          "description": "Fetch the subtitles of a YouTube video by video ID through the Decodo Web Data API (`youtube_subtitles` target) and return them as JSON. Use it to read or summarise what is said in a video; set `language_code` for a specific language. Docs: https://help.decodo.com/docs/web-scraping-api-youtube-subtitles",
+          "group": "social_media",
+          "fields": [
+            "query",
+            "language_code"
+          ],
+          "required": [
+            "query"
+          ],
+          "descriptions": {
+            "query": "YouTube video ID (e.g., \"L8zSWbQN-v8\")",
+            "language_code": "Language code for subtitles (e.g., \"en\", \"es\")"
+          },
+          "flow": "scrape",
+          "target": "youtube_subtitles",
+          "fixed": {
+            "target": "youtube_subtitles"
+          },
+          "result": {
+            "failures": [
+              {
+                "path": "status",
+                "equals": "failed",
+                "message": "message",
+                "code": "status_code",
+                "retryable": true
+              },
+              {
+                "path": "results.0.status_code",
+                "atLeast": 400
+              }
+            ],
+            "from": "results.0.content"
           }
         }
       ]
