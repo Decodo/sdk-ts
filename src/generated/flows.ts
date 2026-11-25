@@ -2,7 +2,7 @@
 
 import type { IrFlowSections } from '../schema/types.js';
 
-export const flowSectionsVersion = "2.7.0";
+export const flowSectionsVersion = "2.8.0";
 
 export const flowSections: IrFlowSections = {
   "operations": {
@@ -2199,45 +2199,6 @@ export const flowSections: IrFlowSections = {
           "target": "chatgpt",
           "fixed": {
             "target": "chatgpt",
-            "parse": true
-          },
-          "result": {
-            "failures": [
-              {
-                "path": "status",
-                "equals": "failed",
-                "message": "message",
-                "code": "status_code",
-                "retryable": true
-              },
-              {
-                "path": "results.0.status_code",
-                "atLeast": 400
-              }
-            ],
-            "from": "results.0.content"
-          }
-        },
-        {
-          "name": "perplexity",
-          "title": "Perplexity",
-          "description": "Send one prompt to Perplexity through the Decodo Web Data API (`perplexity` target) and return its answer parsed as JSON. Each call is a single prompt and answer, with no conversation history. Use it to see how Perplexity answers a question and which sources it draws on. Docs: https://help.decodo.com/docs/web-scraping-api-perplexity",
-          "group": "ai",
-          "fields": [
-            "prompt",
-            "geo"
-          ],
-          "required": [
-            "prompt"
-          ],
-          "descriptions": {
-            "prompt": "Prompt to send to Perplexity",
-            "geo": "Geolocation of the desired request, expressed as a country name"
-          },
-          "flow": "scrape",
-          "target": "perplexity",
-          "fixed": {
-            "target": "perplexity",
             "parse": true
           },
           "result": {
