@@ -1125,40 +1125,6 @@ export const requestJsonSchemas = {
     ],
     "additionalProperties": false
   },
-  [Target.Perplexity]: {
-    "type": "object",
-    "properties": {
-      "target": {
-        "const": "perplexity"
-      },
-      "prompt": {
-        "type": "string",
-        "maxLength": 8192
-      },
-      "parse": {
-        "type": "boolean"
-      },
-      "geo": {
-        "type": "string"
-      },
-      "device_type": {
-        "type": "string"
-      },
-      "markdown": {
-        "type": "boolean"
-      },
-      "xhr": {
-        "type": "boolean"
-      },
-      "callback_url": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "target"
-    ],
-    "additionalProperties": false
-  },
   [Target.Gemini]: {
     "type": "object",
     "properties": {
@@ -1663,7 +1629,6 @@ export const requestSchemas: Record<Target, z.ZodObject> = {
   [Target.Target]: z.fromJSONSchema(requestJsonSchemas[Target.Target] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Universal]: z.fromJSONSchema(requestJsonSchemas[Target.Universal] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Chatgpt]: z.fromJSONSchema(requestJsonSchemas[Target.Chatgpt] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
-  [Target.Perplexity]: z.fromJSONSchema(requestJsonSchemas[Target.Perplexity] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Gemini]: z.fromJSONSchema(requestJsonSchemas[Target.Gemini] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Bbb]: z.fromJSONSchema(requestJsonSchemas[Target.Bbb] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,
   [Target.Autotrader]: z.fromJSONSchema(requestJsonSchemas[Target.Autotrader] as unknown as z.core.JSONSchema.JSONSchema) as z.ZodObject,

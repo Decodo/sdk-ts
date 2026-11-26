@@ -20,7 +20,7 @@ Build strongly typed scraping workflows for search engines, eCommerce platforms,
 
 # What is Decodo TypeScript SDK?
 
-Decodo TypeScript SDK is the official TypeScript SDK for the Decodo Web Data API. It provides a typed interface for interacting with Decodo targets like Google, Amazon, TikTok, YouTube, ChatGPT, Perplexity, and more.
+Decodo TypeScript SDK is the official TypeScript SDK for the Decodo Web Data API. It provides a typed interface for interacting with Decodo targets like Google, Amazon, TikTok, YouTube, ChatGPT, and more.
 
 Instead of manually constructing HTTP requests and validating payloads, you can work with fully typed methods and target-specific parameters directly in your editor.
 
@@ -583,7 +583,6 @@ Each target accepts one primary input parameter (`url`, `query`, `product_id`, o
 | Target                | Description                      | Example                                                                        |
 | --------------------- | -------------------------------- | ------------------------------------------------------------------------------ |
 | `Target.Chatgpt`      | ChatGPT response for a prompt    | `{ target: Target.Chatgpt, prompt: "What are the top three dog breeds?" }`     |
-| `Target.Perplexity`   | Perplexity response for a prompt | `{ target: Target.Perplexity, prompt: "What causes seasonal allergies?" }`     |
 | `Target.Gemini`       | Gemini response for a prompt     | `{ target: Target.Gemini, prompt: "What are the top three dog breeds?" }`      |
 | `Target.GoogleAiMode` | Google AI Mode response          | `{ target: Target.GoogleAiMode, query: "What are the top three dog breeds?" }` |
 

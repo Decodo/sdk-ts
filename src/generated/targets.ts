@@ -26,7 +26,6 @@ export enum Target {
   Target = 'target',
   Universal = 'universal',
   Chatgpt = 'chatgpt',
-  Perplexity = 'perplexity',
   Gemini = 'gemini',
   Bbb = 'bbb',
   Autotrader = 'autotrader',
@@ -46,7 +45,7 @@ export enum Target {
 /** API discriminator string literals (same values as {@link Target}). */
 export type TargetString = (typeof Target)[keyof typeof Target];
 
-export const targets = [Target.GoogleSearch, Target.GoogleTravelHotels, Target.Google, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.Universal, Target.Chatgpt, Target.Perplexity, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
+export const targets = [Target.GoogleSearch, Target.GoogleTravelHotels, Target.Google, Target.GoogleAiMode, Target.GoogleAds, Target.GoogleLens, Target.BingSearch, Target.Bing, Target.AmazonProduct, Target.AmazonPricing, Target.AmazonSearch, Target.AmazonSellers, Target.AmazonBestsellers, Target.Amazon, Target.WalmartProduct, Target.WalmartSearch, Target.Walmart, Target.TargetProduct, Target.TargetSearch, Target.Target, Target.Universal, Target.Chatgpt, Target.Gemini, Target.Bbb, Target.Autotrader, Target.Mobile, Target.Airbnb, Target.AppleAppStore, Target.TiktokPost, Target.TiktokShopSearch, Target.TiktokShopProduct, Target.Tiktok, Target.YoutubeMetadata, Target.YoutubeSearch, Target.YoutubeSubtitles, Target.YoutubeChannel] as const;
 
 export interface GoogleSearchParams {
   query?: string;
@@ -360,16 +359,6 @@ export interface ChatgptParams {
   callback_url?: string;
 }
 
-export interface PerplexityParams {
-  prompt?: string;
-  parse?: boolean;
-  geo?: string;
-  device_type?: string;
-  markdown?: boolean;
-  xhr?: boolean;
-  callback_url?: string;
-}
-
 export interface GeminiParams {
   prompt?: string;
   parse?: boolean;
@@ -523,7 +512,6 @@ export type TargetParamsMap = {
   [Target.Target]: TargetParams;
   [Target.Universal]: UniversalParams;
   [Target.Chatgpt]: ChatgptParams;
-  [Target.Perplexity]: PerplexityParams;
   [Target.Gemini]: GeminiParams;
   [Target.Bbb]: BbbParams;
   [Target.Autotrader]: AutotraderParams;
@@ -664,11 +652,6 @@ export const targetMeta: Record<Target, TargetMeta> = {
     group: "AI Tools",
     response_format: "json",
     parameters: ["prompt", "search", "parse", "geo", "device_type", "markdown", "xhr", "callback_url"],
-  },
-  [Target.Perplexity]: {
-    group: "AI Tools",
-    response_format: "json",
-    parameters: ["prompt", "parse", "geo", "device_type", "markdown", "xhr", "callback_url"],
   },
   [Target.Gemini]: {
     group: "AI Tools",
